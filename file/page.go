@@ -20,6 +20,12 @@ func NewPage(blockSize int32) *Page {
 	}
 }
 
+func NewPageFromBytes(b []byte) *Page {
+	return &Page{
+		buffer: b,
+	}
+}
+
 func (p *Page) GetInt(offset int32) int32 {
 	data := p.buffer[offset : offset+Int32Bytes]
 	val := binary.LittleEndian.Uint32(data)

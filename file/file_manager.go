@@ -114,9 +114,6 @@ func (fm *FileManager) Append(filename string) (*BlockID, error) {
 }
 
 func (fm *FileManager) Length(filename string) (int32, error) {
-	fm.mu.Lock()
-	defer fm.mu.Unlock()
-
 	f, err := fm.getFile(filename)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get file: %w", err)
