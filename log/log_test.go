@@ -10,7 +10,7 @@ import (
 )
 
 func TestLog(t *testing.T) {
-	db, err := server.NewSimpleDB("logtest", 400)
+	db, err := server.NewSimpleDB("logtest", 400, 8)
 	if err != nil {
 		t.Fatalf("failed to create new simple db: %v", err)
 	}

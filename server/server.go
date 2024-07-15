@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 
+	"github.com/adieumonks/simple-db/buffer"
 	"github.com/adieumonks/simple-db/file"
 	"github.com/adieumonks/simple-db/log"
 )
@@ -14,9 +15,10 @@ const (
 type SimpleDB struct {
 	fm *file.FileManager
 	lm *log.LogManager
+	bm *buffer.BufferManager
 }
 
-func NewSimpleDB(dirname string, blockSize int32) (*SimpleDB, error) {
+func NewSimpleDB(dirname string, blockSize, buffferSize int32) (*SimpleDB, error) {
 	fm, err := file.NewFileManager(dirname, blockSize)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new file manager: %w", err)
@@ -27,9 +29,12 @@ func NewSimpleDB(dirname string, blockSize int32) (*SimpleDB, error) {
 		return nil, fmt.Errorf("failed to create new log manager: %w", err)
 	}
 
+	bm := buffer.NewBufferManager(fm, lm, buffferSize)
+
 	return &SimpleDB{
 		fm: fm,
 		lm: lm,
+		bm: bm,
 	}, nil
 }
 
@@ -39,4 +44,8 @@ func (db *SimpleDB) FileManager() *file.FileManager {
 
 func (db *SimpleDB) LogManager() *log.LogManager {
 	return db.lm
+}
+
+func (db *SimpleDB) BufferManager() *buffer.BufferManager {
+	return db.bm
 }
