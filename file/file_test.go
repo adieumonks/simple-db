@@ -1,6 +1,7 @@
 package file_test
 
 import (
+	"path"
 	"testing"
 
 	"github.com/adieumonks/simple-db/file"
@@ -8,7 +9,7 @@ import (
 )
 
 func TestFile(t *testing.T) {
-	db, err := server.NewSimpleDB("filetest", 400, 8)
+	db, err := server.NewSimpleDB(path.Join(t.TempDir(), "filetest"), 400, 8)
 	if err != nil {
 		t.Fatalf("failed to create new simple db: %v", err)
 	}

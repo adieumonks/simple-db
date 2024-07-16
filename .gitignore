@@ -24,3 +24,6 @@ go.work.sum
 # test
 filetest
 logtest
+buffertest
+txtest
+recoverytest

@@ -9,7 +9,7 @@ type Buffer struct {
 	fm       *file.FileManager
 	lm       *log.LogManager
 	contents *file.Page
-	block    *file.BlockID
+	block    file.BlockID
 	pins     int32
 	txnum    int32
 	lsn      int32
@@ -29,7 +29,7 @@ func (b *Buffer) Contents() *file.Page {
 	return b.contents
 }
 
-func (b *Buffer) Block() *file.BlockID {
+func (b *Buffer) Block() file.BlockID {
 	return b.block
 }
 
@@ -48,7 +48,7 @@ func (b *Buffer) ModifyingTx() int32 {
 	return b.txnum
 }
 
-func (b *Buffer) AssignToBlock(block *file.BlockID) {
+func (b *Buffer) AssignToBlock(block file.BlockID) {
 	b.Flush()
 	b.block = block
 	b.fm.Read(block, b.contents)

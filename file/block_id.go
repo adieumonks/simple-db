@@ -7,8 +7,8 @@ type BlockID struct {
 	blockNum int32
 }
 
-func NewBlockID(filename string, blockNum int32) *BlockID {
-	return &BlockID{
+func NewBlockID(filename string, blockNum int32) BlockID {
+	return BlockID{
 		filename: filename,
 		blockNum: blockNum,
 	}
@@ -20,10 +20,6 @@ func (b *BlockID) Filename() string {
 
 func (b *BlockID) Number() int32 {
 	return b.blockNum
-}
-
-func (b *BlockID) Equals(other *BlockID) bool {
-	return b.filename == other.filename && b.blockNum == other.blockNum
 }
 
 func (b *BlockID) String() string {

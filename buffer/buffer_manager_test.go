@@ -1,6 +1,7 @@
 package buffer_test
 
 import (
+	"path"
 	"testing"
 
 	"github.com/adieumonks/simple-db/buffer"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestBufferManager(t *testing.T) {
-	db, err := server.NewSimpleDB("buffertest", 400, 3)
+	db, err := server.NewSimpleDB(path.Join(t.TempDir(), "buffertest"), 400, 3)
 	if err != nil {
 		t.Fatalf("failed to create new simple db: %v", err)
 	}
@@ -42,7 +43,7 @@ func TestBufferManager(t *testing.T) {
 	t.Log("final buffer allocation")
 	for i, b := range buff {
 		if b != nil {
-			t.Logf("buffer[%d]: pinned to block %s", i, b.Block())
+			t.Logf("buffer[%d]: pinned to block %v", i, b.Block())
 		}
 	}
 }

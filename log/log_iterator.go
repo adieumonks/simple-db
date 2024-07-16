@@ -8,13 +8,13 @@ import (
 
 type LogIterator struct {
 	fm        *file.FileManager
-	block     *file.BlockID
+	block     file.BlockID
 	page      *file.Page
 	curentPos int32
 	boundary  int32
 }
 
-func NewLogIterator(fm *file.FileManager, block *file.BlockID) (*LogIterator, error) {
+func NewLogIterator(fm *file.FileManager, block file.BlockID) (*LogIterator, error) {
 	b := make([]byte, fm.BlockSize())
 	page := file.NewPageFromBytes(b)
 
@@ -46,7 +46,7 @@ func (it *LogIterator) Next() []byte {
 	return rec
 }
 
-func (it *LogIterator) moveToBlock(block *file.BlockID) error {
+func (it *LogIterator) moveToBlock(block file.BlockID) error {
 	err := it.fm.Read(block, it.page)
 	if err != nil {
 		return fmt.Errorf("failed to read block %v: %w", block, err)

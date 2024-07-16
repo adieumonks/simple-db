@@ -10,7 +10,7 @@ type LogManager struct {
 	fm           *file.FileManager
 	logfile      string
 	logPage      *file.Page
-	currentBlock *file.BlockID
+	currentBlock file.BlockID
 	latestLSN    int32
 	lastSavedLSN int32
 }
@@ -89,10 +89,10 @@ func (lm *LogManager) Append(rec []byte) (int32, error) {
 	return lm.latestLSN, nil
 }
 
-func (lm *LogManager) appendNewBlock() (*file.BlockID, error) {
+func (lm *LogManager) appendNewBlock() (file.BlockID, error) {
 	block, err := lm.fm.Append(lm.logfile)
 	if err != nil {
-		return nil, fmt.Errorf("failed to append new block: %w", err)
+		return file.BlockID{}, fmt.Errorf("failed to append new block: %w", err)
 	}
 	lm.logPage.SetInt(0, lm.fm.BlockSize())
 	lm.fm.Write(block, lm.logPage)

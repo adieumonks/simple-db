@@ -1,13 +1,13 @@
 package buffer
 
 import (
-	"context"
 	"errors"
 	"sync"
 	"time"
 
 	"github.com/adieumonks/simple-db/file"
 	"github.com/adieumonks/simple-db/log"
+	"github.com/adieumonks/simple-db/util"
 )
 
 const (
@@ -60,14 +60,14 @@ func (bm *BufferManager) Unpin(buffer *Buffer) {
 	}
 }
 
-func (bm *BufferManager) Pin(block *file.BlockID) (*Buffer, error) {
+func (bm *BufferManager) Pin(block file.BlockID) (*Buffer, error) {
 	bm.cond.L.Lock()
 	defer bm.cond.L.Unlock()
 
 	timestamp := time.Now()
 	buffer := bm.tryToPin(block)
 	for buffer == nil && !bm.waitTooLong(timestamp) {
-		wait(bm.cond, MAX_TIME)
+		util.Wait(bm.cond, MAX_TIME)
 		buffer = bm.tryToPin(block)
 	}
 	if buffer == nil {
@@ -76,27 +76,11 @@ func (bm *BufferManager) Pin(block *file.BlockID) (*Buffer, error) {
 	return buffer, nil
 }
 
-// 通知されるか、タイムアウトするまで待機する
-func wait(cond *sync.Cond, timeout time.Duration) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	stopf := context.AfterFunc(ctx, func() {
-		cond.L.Lock()
-		defer cond.L.Unlock()
-
-		cond.Broadcast()
-	})
-	defer stopf()
-
-	cond.Wait()
-}
-
 func (bm *BufferManager) waitTooLong(startTime time.Time) bool {
 	return time.Since(startTime) > MAX_TIME
 }
 
-func (bm *BufferManager) tryToPin(block *file.BlockID) *Buffer {
+func (bm *BufferManager) tryToPin(block file.BlockID) *Buffer {
 	buffer := bm.findExistingBuffer(block)
 	if buffer == nil {
 		buffer = bm.chooseUnpinnedBuffer()
@@ -112,10 +96,10 @@ func (bm *BufferManager) tryToPin(block *file.BlockID) *Buffer {
 	return buffer
 }
 
-func (bm *BufferManager) findExistingBuffer(block *file.BlockID) *Buffer {
+func (bm *BufferManager) findExistingBuffer(block file.BlockID) *Buffer {
 	for _, buffer := range bm.bufferPool {
 		b := buffer.Block()
-		if b != nil && b.Equals(block) {
+		if b == block {
 			return buffer
 		}
 	}

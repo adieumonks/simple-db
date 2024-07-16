@@ -1,6 +1,7 @@
 package buffer_test
 
 import (
+	"path"
 	"testing"
 
 	"github.com/adieumonks/simple-db/file"
@@ -8,7 +9,7 @@ import (
 )
 
 func TestBuffer(t *testing.T) {
-	db, err := server.NewSimpleDB("buffertest", 400, 3)
+	db, err := server.NewSimpleDB(path.Join(t.TempDir(), "buffertesf"), 400, 3)
 	if err != nil {
 		t.Fatalf("failed to create new simple db: %v", err)
 	}

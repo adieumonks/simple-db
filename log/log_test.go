@@ -2,6 +2,7 @@ package log_test
 
 import (
 	"fmt"
+	"path"
 	"testing"
 
 	"github.com/adieumonks/simple-db/file"
@@ -10,7 +11,7 @@ import (
 )
 
 func TestLog(t *testing.T) {
-	db, err := server.NewSimpleDB("logtest", 400, 8)
+	db, err := server.NewSimpleDB(path.Join(t.TempDir(), "logtest"), 400, 8)
 	if err != nil {
 		t.Fatalf("failed to create new simple db: %v", err)
 	}

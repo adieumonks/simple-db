@@ -39,7 +39,7 @@ func NewFileManager(dirname string, blockSize int32) (*FileManager, error) {
 	}, nil
 }
 
-func (fm *FileManager) Read(block *BlockID, page *Page) error {
+func (fm *FileManager) Read(block BlockID, page *Page) error {
 	fm.mu.Lock()
 	defer fm.mu.Unlock()
 
@@ -61,7 +61,7 @@ func (fm *FileManager) Read(block *BlockID, page *Page) error {
 	return nil
 }
 
-func (fm *FileManager) Write(block *BlockID, page *Page) error {
+func (fm *FileManager) Write(block BlockID, page *Page) error {
 	fm.mu.Lock()
 	defer fm.mu.Unlock()
 
@@ -83,13 +83,13 @@ func (fm *FileManager) Write(block *BlockID, page *Page) error {
 	return nil
 }
 
-func (fm *FileManager) Append(filename string) (*BlockID, error) {
+func (fm *FileManager) Append(filename string) (BlockID, error) {
 	fm.mu.Lock()
 	defer fm.mu.Unlock()
 
 	newBlockNum, err := fm.Length(filename)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get length: %w", err)
+		return BlockID{}, fmt.Errorf("failed to get length: %w", err)
 	}
 
 	block := NewBlockID(filename, newBlockNum)
@@ -97,17 +97,17 @@ func (fm *FileManager) Append(filename string) (*BlockID, error) {
 
 	f, err := fm.getFile(filename)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get file: %w", err)
+		return BlockID{}, fmt.Errorf("failed to get file: %w", err)
 	}
 
 	_, err = f.Seek(int64(block.Number()*fm.blockSize), 0)
 	if err != nil {
-		return nil, fmt.Errorf("failed to seek file: %w", err)
+		return BlockID{}, fmt.Errorf("failed to seek file: %w", err)
 	}
 
 	_, err = f.Write(b)
 	if err != nil {
-		return nil, fmt.Errorf("failed to write file: %w", err)
+		return BlockID{}, fmt.Errorf("failed to write file: %w", err)
 	}
 
 	return block, nil

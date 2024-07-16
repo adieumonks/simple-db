@@ -6,6 +6,7 @@ import (
 	"github.com/adieumonks/simple-db/buffer"
 	"github.com/adieumonks/simple-db/file"
 	"github.com/adieumonks/simple-db/log"
+	"github.com/adieumonks/simple-db/tx"
 )
 
 const (
@@ -36,6 +37,10 @@ func NewSimpleDB(dirname string, blockSize, buffferSize int32) (*SimpleDB, error
 		lm: lm,
 		bm: bm,
 	}, nil
+}
+
+func (db *SimpleDB) NewTransaction() *tx.Transaction {
+	return tx.NewTransaction(db.fm, db.lm, db.bm)
 }
 
 func (db *SimpleDB) FileManager() *file.FileManager {
