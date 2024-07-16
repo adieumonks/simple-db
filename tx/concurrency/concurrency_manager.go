@@ -35,7 +35,7 @@ func (cm *ConcurrencyManager) XLock(block file.BlockID) error {
 		return nil
 	}
 
-	if err := lockTable.SLock(block); err != nil {
+	if err := cm.SLock(block); err != nil {
 		return fmt.Errorf("failed to acquire SLock: %w", err)
 	}
 	if err := lockTable.XLock(block); err != nil {
