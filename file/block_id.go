@@ -14,14 +14,14 @@ func NewBlockID(filename string, blockNum int32) BlockID {
 	}
 }
 
-func (b *BlockID) Filename() string {
+func (b BlockID) Filename() string {
 	return b.filename
 }
 
-func (b *BlockID) Number() int32 {
+func (b BlockID) Number() int32 {
 	return b.blockNum
 }
 
-func (b *BlockID) String() string {
+func (b BlockID) String() string {
 	return fmt.Sprintf("[file %s, block %d]", b.filename, b.blockNum)
 }
