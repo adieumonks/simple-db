@@ -105,12 +105,19 @@ func (ts *TableScan) SetString(fieldName string, val string) error {
 	return ts.rp.SetString(ts.currentSlot, fieldName, val)
 }
 
-func (ts *TableScan) SetVal(fieldName string, val query.Constant) {
+func (ts *TableScan) SetVal(fieldName string, val *query.Constant) error {
 	if ts.layout.Schema().Type(fieldName) == INTEGER {
-		ts.SetInt(fieldName, val.AsInt())
+		err := ts.SetInt(fieldName, val.AsInt())
+		if err != nil {
+			return fmt.Errorf("failed to set int value: %w", err)
+		}
 	} else {
-		ts.SetString(fieldName, val.AsString())
+		err := ts.SetString(fieldName, val.AsString())
+		if err != nil {
+			return fmt.Errorf("failed to set string value: %w", err)
+		}
 	}
+	return nil
 }
 
 func (ts *TableScan) Insert() error {
