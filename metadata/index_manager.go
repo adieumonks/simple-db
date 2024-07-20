@@ -95,6 +95,10 @@ func (im *IndexManager) GetIndexInfo(tableName string, tx *tx.Transaction) (map[
 			ii := NewIndexInfo(indexName, fieldName, layout.Schema(), tx, si)
 			result[indexName] = ii
 		}
+		next, err = ts.Next()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get next: %w", err)
+		}
 	}
 	ts.Close()
 	return result, nil

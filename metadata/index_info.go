@@ -24,7 +24,7 @@ func NewIndexInfo(indexName string, fieldName string, tableSchema *record.Schema
 		tableSchema: tableSchema,
 		si:          si,
 	}
-	ii.createIndexLayout()
+	ii.indexLayout = ii.createIndexLayout()
 	return ii
 }
 
