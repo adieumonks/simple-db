@@ -54,3 +54,38 @@ func (vm *ViewManager) CreateView(viewName string, viewDef string, tx *tx.Transa
 	ts.Close()
 	return nil
 }
+
+func (vm *ViewManager) GetViewDef(viewName string, tx *tx.Transaction) (string, error) {
+	var result string
+	layout, err := vm.tableManager.GetLayout("viewcat", tx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get layout: %w", err)
+	}
+	ts, err := record.NewTableScan(tx, "viewcat", layout)
+	if err != nil {
+		return "", fmt.Errorf("failed to create table scan: %w", err)
+	}
+	next, err := ts.Next()
+	if err != nil {
+		return "", fmt.Errorf("failed to get next: %w", err)
+	}
+	for next {
+		viewNameAtRecord, err := ts.GetString("viewname")
+		if err != nil {
+			return "", fmt.Errorf("failed to get string: %w", err)
+		}
+		if viewNameAtRecord == viewName {
+			result, err = ts.GetString("viewdef")
+			if err != nil {
+				return "", fmt.Errorf("failed to get string: %w", err)
+			}
+			break
+		}
+		next, err = ts.Next()
+		if err != nil {
+			return "", fmt.Errorf("failed to get next: %w", err)
+		}
+	}
+	ts.Close()
+	return result, nil
+}

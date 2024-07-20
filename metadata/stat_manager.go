@@ -35,9 +35,12 @@ func (sm *StatManager) GetStatInfo(tableName string, layout *record.Layout, tx *
 		sm.refreshStatics(tx)
 	}
 
+	var si *StatInfo
 	si, ok := sm.tableStats[tableName]
 	if !ok {
-		si, err := sm.calcTableStats(tableName, layout, tx)
+		var err error
+		si, err = sm.calcTableStats(tableName, layout, tx)
+
 		if err != nil {
 			return nil, fmt.Errorf("failed to calculate table stats: %w", err)
 		}
