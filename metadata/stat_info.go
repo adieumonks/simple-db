@@ -12,11 +12,11 @@ func NewStatInfo(numBlocks int32, numRecords int32) *StatInfo {
 	}
 }
 
-func (si *StatInfo) blocksAccessed() int32 {
+func (si *StatInfo) BlocksAccessed() int32 {
 	return si.numBlocks
 }
 
-func (si *StatInfo) recordsOutput() int32 {
+func (si *StatInfo) RecordsOutput() int32 {
 	return si.numRecords
 }
 

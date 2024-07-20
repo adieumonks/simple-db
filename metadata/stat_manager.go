@@ -15,12 +15,15 @@ type StatManager struct {
 	mu           sync.Mutex
 }
 
-func NewStatManager(tm *TableManager, tx *tx.Transaction) *StatManager {
+func NewStatManager(tm *TableManager, tx *tx.Transaction) (*StatManager, error) {
 	sm := &StatManager{
 		tableManager: tm,
 	}
-	sm.refreshStatics(tx)
-	return sm
+	err := sm.refreshStatics(tx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to refresh statics: %w", err)
+	}
+	return sm, nil
 }
 
 func (sm *StatManager) GetStatInfo(tableName string, layout *record.Layout, tx *tx.Transaction) (*StatInfo, error) {
@@ -44,6 +47,9 @@ func (sm *StatManager) GetStatInfo(tableName string, layout *record.Layout, tx *
 }
 
 func (sm *StatManager) refreshStatics(tx *tx.Transaction) error {
+	sm.tableStats = make(map[string]*StatInfo)
+	sm.numCalls = 0
+
 	tcatLayout, err := sm.tableManager.GetLayout("tblcat", tx)
 	if err != nil {
 		return fmt.Errorf("failed to get layout: %v", err)
@@ -70,6 +76,11 @@ func (sm *StatManager) refreshStatics(tx *tx.Transaction) error {
 			return fmt.Errorf("failed to calculate table stats: %v", err)
 		}
 		sm.tableStats[tableName] = si
+
+		next, err = tcat.Next()
+		if err != nil {
+			return fmt.Errorf("failed to get next: %v", err)
+		}
 	}
 	tcat.Close()
 	return nil
@@ -89,6 +100,10 @@ func (sm *StatManager) calcTableStats(tableName string, layout *record.Layout, t
 	for next {
 		numRecords++
 		numBlocks = ts.GetRID().BlockNumber() + 1
+		next, err = ts.Next()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get next: %v", err)
+		}
 	}
 	ts.Close()
 	return &StatInfo{

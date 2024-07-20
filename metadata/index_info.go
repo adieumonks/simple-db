@@ -32,14 +32,14 @@ func (ii *IndexInfo) Open() index.Index {
 	return hash.NewHashIndex(ii.tx, ii.indexName, ii.indexLayout)
 }
 
-func (ii *IndexInfo) blocksAccessed() int32 {
+func (ii *IndexInfo) BlocksAccessed() int32 {
 	rpb := ii.tx.BlockSize() / ii.indexLayout.SlotSize()
-	numBlocks := ii.si.recordsOutput() / rpb
+	numBlocks := ii.si.RecordsOutput() / rpb
 	return hash.NewHashIndex(ii.tx, ii.indexName, ii.indexLayout).SearchCost(numBlocks, rpb)
 }
 
-func (ii *IndexInfo) recordsOutput() int32 {
-	return ii.si.recordsOutput() / ii.si.DistinctValues(ii.fieldName)
+func (ii *IndexInfo) RecordsOutput() int32 {
+	return ii.si.RecordsOutput() / ii.si.DistinctValues(ii.fieldName)
 }
 
 func (ii *IndexInfo) DistinctValues(fieldName string) int32 {
