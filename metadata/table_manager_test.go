@@ -10,7 +10,7 @@ import (
 )
 
 func TestTableManager(t *testing.T) {
-	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "recordtest"), 400, 8)
+	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "tablemanagertest"), 400, 8)
 	tx := db.NewTransaction()
 	tm, err := metadata.NewTableManager(true, tx)
 	if err != nil {
