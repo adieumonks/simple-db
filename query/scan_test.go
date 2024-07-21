@@ -46,25 +46,25 @@ func TestScan1(t *testing.T) {
 	t.Logf("the predicate is %v", pred)
 
 	s3 := query.NewSelectScan(s2, pred)
-	next, err := s3.Next()
+
+	fields := []string{"B"}
+	s4 := query.NewProjectScan(s3, fields)
+
+	next, err := s4.Next()
 	if err != nil {
 		t.Fatalf("failed to get next record: %v", err)
 	}
 	for next {
-		a, err := s3.GetInt("A")
-		if err != nil {
-			t.Fatalf("failed to get int: %v", err)
-		}
-		b, err := s3.GetString("B")
+		b, err := s4.GetString("B")
 		if err != nil {
 			t.Fatalf("failed to get string: %v", err)
 		}
-		t.Logf("A: %d, B: %s", a, b)
-		next, err = s3.Next()
+		t.Logf("B: %s", b)
+		next, err = s4.Next()
 		if err != nil {
 			t.Fatalf("failed to get next record: %v", err)
 		}
 	}
-	s3.Close()
+	s4.Close()
 	tx.Commit()
 }
