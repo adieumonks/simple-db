@@ -5,7 +5,7 @@ import (
 )
 
 type Scan interface {
-	BeforeFirst()
+	BeforeFirst() error
 	Next() (bool, error)
 	GetInt(fieldName string) (int32, error)
 	GetString(fieldName string) (string, error)

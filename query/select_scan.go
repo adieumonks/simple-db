@@ -12,8 +12,11 @@ func NewSelectScan(scan Scan, pred *Predicate) *SelectScan {
 }
 
 // Scan methods
-func (ss *SelectScan) BeforeFirst() {
-	ss.scan.BeforeFirst()
+func (ss *SelectScan) BeforeFirst() error {
+	if err := ss.scan.BeforeFirst(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ss *SelectScan) Next() (bool, error) {

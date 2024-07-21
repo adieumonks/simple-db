@@ -34,8 +34,9 @@ func NewTableScan(tx *tx.Transaction, tableName string, layout *Layout) (*TableS
 	return ts, nil
 }
 
-func (ts *TableScan) BeforeFirst() {
+func (ts *TableScan) BeforeFirst() error {
 	ts.moveToBlock(0)
+	return nil
 }
 
 func (ts *TableScan) Next() (bool, error) {

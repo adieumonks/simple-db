@@ -25,7 +25,9 @@ func TestScan1(t *testing.T) {
 		t.Fatalf("failed to create table scan: %v", err)
 	}
 
-	s1.BeforeFirst()
+	if err := s1.BeforeFirst(); err != nil {
+		t.Fatalf("failed to prepare for first")
+	}
 	n := 200
 	t.Logf("inserting %d random records.", n)
 	for i := 0; i < n; i++ {

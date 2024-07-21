@@ -17,8 +17,11 @@ func NewProjectScan(scan Scan, fieldList []string) *ProjectScan {
 	return &ProjectScan{scan: scan, fieldList: fieldList}
 }
 
-func (ps *ProjectScan) BeforeFirst() {
-	ps.scan.BeforeFirst()
+func (ps *ProjectScan) BeforeFirst() error {
+	if err := ps.scan.BeforeFirst(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ps *ProjectScan) Next() (bool, error) {
