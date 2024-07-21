@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/adieumonks/simple-db/file"
-	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/tx"
 )
 
@@ -71,19 +70,19 @@ func (ts *TableScan) GetString(fieldName string) (string, error) {
 	return ts.rp.GetString(ts.currentSlot, fieldName)
 }
 
-func (ts *TableScan) GetVal(fieldName string) (*query.Constant, error) {
+func (ts *TableScan) GetVal(fieldName string) (*Constant, error) {
 	if ts.layout.Schema().Type(fieldName) == INTEGER {
 		val, err := ts.GetInt(fieldName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get int value: %v", err)
 		}
-		return query.NewConstantFromInt(val), nil
+		return NewConstantFromInt(val), nil
 	} else {
 		val, err := ts.GetString(fieldName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get string value: %v", err)
 		}
-		return query.NewConstantFromString(val), nil
+		return NewConstantFromString(val), nil
 	}
 }
 
@@ -105,7 +104,7 @@ func (ts *TableScan) SetString(fieldName string, val string) error {
 	return ts.rp.SetString(ts.currentSlot, fieldName, val)
 }
 
-func (ts *TableScan) SetVal(fieldName string, val *query.Constant) error {
+func (ts *TableScan) SetVal(fieldName string, val *Constant) error {
 	if ts.layout.Schema().Type(fieldName) == INTEGER {
 		err := ts.SetInt(fieldName, val.AsInt())
 		if err != nil {

@@ -1,4 +1,6 @@
-package query
+package record
+
+import "fmt"
 
 type Constant struct {
 	ival *int32
@@ -42,7 +44,7 @@ func (c *Constant) HashCode() int32 {
 
 func (c *Constant) String() string {
 	if c.ival != nil {
-		return string(*c.ival)
+		return fmt.Sprintf("%d", *c.ival)
 	}
 	return *c.sval
 }
