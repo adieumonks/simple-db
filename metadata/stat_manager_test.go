@@ -14,7 +14,10 @@ import (
 
 func TestStatManager(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "statmanagertest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 	tm, err := metadata.NewTableManager(true, tx)
 	if err != nil {
 		t.Fatalf("failed to create table manager: %v", err)
@@ -40,10 +43,16 @@ func TestStatManager(t *testing.T) {
 	}
 
 	for i := 0; i < 50; i++ {
-		ts.Insert()
+		if err := ts.Insert(); err != nil {
+			t.Fatalf("failed to insert: %v", err)
+		}
 		n := int32(math.Round(rand.Float64() * 50))
-		ts.SetInt("A", n)
-		ts.SetString("B", fmt.Sprintf("rec%d", n))
+		if err := ts.SetInt("A", n); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := ts.SetString("B", fmt.Sprintf("rec%d", n)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 	}
 
 	sm, err := metadata.NewStatManager(tm, tx)
@@ -61,5 +70,7 @@ func TestStatManager(t *testing.T) {
 	t.Logf("V(MyTable, A) = %d", si.DistinctValues("A"))
 	t.Logf("V(MyTable, B) = %d", si.DistinctValues("B"))
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

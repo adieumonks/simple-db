@@ -32,7 +32,9 @@ func (r *CommitRecord) TxNumber() int32 {
 	return r.txnum
 }
 
-func (r *CommitRecord) Undo(tx Transaction) {}
+func (r *CommitRecord) Undo(tx Transaction) error {
+	return nil
+}
 
 func (r *CommitRecord) String() string {
 	return fmt.Sprintf("<COMMIT %d>", r.txnum)

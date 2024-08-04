@@ -11,7 +11,10 @@ import (
 
 func TestTableManager(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "tablemanagertest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 	tm, err := metadata.NewTableManager(true, tx)
 	if err != nil {
 		t.Fatalf("failed to create table manager: %v", err)
@@ -20,7 +23,9 @@ func TestTableManager(t *testing.T) {
 	schema := record.NewSchema()
 	schema.AddIntField("A")
 	schema.AddStringField("B", 9)
-	tm.CreateTable("MyTable", schema, tx)
+	if err := tm.CreateTable("MyTable", schema, tx); err != nil {
+		t.Fatalf("failed to create table: %v", err)
+	}
 
 	layout, err := tm.GetLayout("MyTable", tx)
 	if err != nil {
@@ -39,5 +44,7 @@ func TestTableManager(t *testing.T) {
 		}
 		t.Logf("  %s: %s", fieldName, fieldType)
 	}
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

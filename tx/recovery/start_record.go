@@ -32,7 +32,9 @@ func (r *StartRecord) TxNumber() int32 {
 	return r.txnum
 }
 
-func (r *StartRecord) Undo(tx Transaction) {}
+func (r *StartRecord) Undo(tx Transaction) error {
+	return nil
+}
 
 func (r *StartRecord) String() string {
 	return fmt.Sprintf("<START %d>", r.txnum)

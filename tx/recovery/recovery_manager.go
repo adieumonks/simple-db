@@ -9,7 +9,7 @@ import (
 )
 
 type Transaction interface {
-	Pin(block file.BlockID)
+	Pin(block file.BlockID) error
 	Unpin(block file.BlockID)
 	SetInt(block file.BlockID, offset int32, val int32, okToLog bool) error
 	SetString(block file.BlockID, offset int32, val string, okToLog bool) error
@@ -22,7 +22,7 @@ type RecoveryManager struct {
 	txnum int32
 }
 
-func NewRecoveryManager(tx Transaction, txnum int32, lm *log.LogManager, bm *buffer.BufferManager) *RecoveryManager {
+func NewRecoveryManager(tx Transaction, txnum int32, lm *log.LogManager, bm *buffer.BufferManager) (*RecoveryManager, error) {
 	rm := RecoveryManager{
 		lm:    lm,
 		bm:    bm,
@@ -30,9 +30,11 @@ func NewRecoveryManager(tx Transaction, txnum int32, lm *log.LogManager, bm *buf
 		txnum: txnum,
 	}
 
-	NewStartRecord(txnum).WriteToLog(lm)
+	if _, err := NewStartRecord(txnum).WriteToLog(lm); err != nil {
+		return nil, err
+	}
 
-	return &rm
+	return &rm, nil
 }
 
 func (rm *RecoveryManager) Commit() error {
@@ -94,7 +96,10 @@ func (rm *RecoveryManager) doRollBack() error {
 	}
 
 	for iter.HasNext() {
-		bytes := iter.Next()
+		bytes, err := iter.Next()
+		if err != nil {
+			return err
+		}
 		rec, err := NewLogRecord(bytes)
 		if err != nil {
 			return fmt.Errorf("failed to create log record: %w", err)
@@ -103,7 +108,9 @@ func (rm *RecoveryManager) doRollBack() error {
 			if rec.Op() == START {
 				return nil
 			}
-			rec.Undo(rm.tx)
+			if err := rec.Undo(rm.tx); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -117,7 +124,10 @@ func (rm *RecoveryManager) doRecover() error {
 	}
 
 	for iter.HasNext() {
-		bytes := iter.Next()
+		bytes, err := iter.Next()
+		if err != nil {
+			return err
+		}
 		rec, err := NewLogRecord(bytes)
 		if err != nil {
 			return fmt.Errorf("failed to create log record: %w", err)
@@ -128,7 +138,9 @@ func (rm *RecoveryManager) doRecover() error {
 		if rec.Op() == COMMIT || rec.Op() == ROLLBACK {
 			finishedTxs[rec.TxNumber()] = true
 		} else if !finishedTxs[rec.TxNumber()] {
-			rec.Undo(rm.tx)
+			if err := rec.Undo(rm.tx); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

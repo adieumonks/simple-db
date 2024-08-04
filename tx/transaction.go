@@ -27,7 +27,7 @@ type Transaction struct {
 	myBuffers *BufferList
 }
 
-func NewTransaction(fm *file.FileManager, lm *log.LogManager, bm *buffer.BufferManager) *Transaction {
+func NewTransaction(fm *file.FileManager, lm *log.LogManager, bm *buffer.BufferManager) (*Transaction, error) {
 	txnum := nextTxNumber()
 	tx := &Transaction{
 		bm:        bm,
@@ -37,29 +37,43 @@ func NewTransaction(fm *file.FileManager, lm *log.LogManager, bm *buffer.BufferM
 		myBuffers: NewBufferList(bm),
 	}
 
-	tx.rm = recovery.NewRecoveryManager(tx, txnum, lm, bm)
-	return tx
+	var err error
+	tx.rm, err = recovery.NewRecoveryManager(tx, txnum, lm, bm)
+	if err != nil {
+		return nil, err
+	}
+
+	return tx, nil
 }
 
-func (tx *Transaction) Commit() {
-	tx.rm.Commit()
+func (tx *Transaction) Commit() error {
+	if err := tx.rm.Commit(); err != nil {
+		return err
+	}
 	tx.cm.Release()
 	tx.myBuffers.UnpinAll()
+	return nil
 }
 
-func (tx *Transaction) Rollback() {
-	tx.rm.RollBack()
+func (tx *Transaction) Rollback() error {
+	if err := tx.rm.RollBack(); err != nil {
+		return err
+	}
 	tx.cm.Release()
 	tx.myBuffers.UnpinAll()
+	return nil
 }
 
-func (tx *Transaction) Recover() {
+func (tx *Transaction) Recover() error {
 	tx.bm.FlushAll(tx.txnum)
-	tx.rm.Recover()
+	if err := tx.rm.Recover(); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (tx *Transaction) Pin(block file.BlockID) {
-	tx.myBuffers.Pin(block)
+func (tx *Transaction) Pin(block file.BlockID) error {
+	return tx.myBuffers.Pin(block)
 }
 
 func (tx *Transaction) Unpin(block file.BlockID) {

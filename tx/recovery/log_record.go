@@ -20,7 +20,7 @@ const (
 type LogRecord interface {
 	Op() LogRecordType
 	TxNumber() int32
-	Undo(tx Transaction)
+	Undo(tx Transaction) error
 }
 
 func NewLogRecord(bytes []byte) (LogRecord, error) {

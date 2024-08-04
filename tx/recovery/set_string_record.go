@@ -52,10 +52,15 @@ func (r *SetStringRecord) TxNumber() int32 {
 	return r.txnum
 }
 
-func (r *SetStringRecord) Undo(tx Transaction) {
-	tx.Pin(r.block)
-	tx.SetString(r.block, r.offset, r.val, false)
+func (r *SetStringRecord) Undo(tx Transaction) error {
+	if err := tx.Pin(r.block); err != nil {
+		return err
+	}
+	if err := tx.SetString(r.block, r.offset, r.val, false); err != nil {
+		return err
+	}
 	tx.Unpin(r.block)
+	return nil
 }
 
 func (r *SetStringRecord) String() string {

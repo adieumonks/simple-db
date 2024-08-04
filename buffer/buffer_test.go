@@ -26,8 +26,12 @@ func TestBuffer(t *testing.T) {
 
 	// One of these pins will flush buffer1 to disk
 	buffer2, _ := bm.Pin(file.NewBlockID("testfile", 2))
-	bm.Pin(file.NewBlockID("testfile", 3))
-	bm.Pin(file.NewBlockID("testfile", 4))
+	if _, err := bm.Pin(file.NewBlockID("testfile", 3)); err != nil {
+		t.Fatalf("failed to pin block: %v", err)
+	}
+	if _, err := bm.Pin(file.NewBlockID("testfile", 4)); err != nil {
+		t.Fatalf("failed to pin block: %v", err)
+	}
 
 	bm.Unpin(buffer2)
 	buffer2, _ = bm.Pin(file.NewBlockID("testfile", 1))

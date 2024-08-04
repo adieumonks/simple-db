@@ -14,7 +14,10 @@ import (
 
 func TestScan1(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "scantest1"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 
 	sch1 := record.NewSchema()
 	sch1.AddIntField("A")
@@ -31,10 +34,16 @@ func TestScan1(t *testing.T) {
 	n := 200
 	t.Logf("inserting %d random records.", n)
 	for i := 0; i < n; i++ {
-		s1.Insert()
+		if err := s1.Insert(); err != nil {
+			t.Fatalf("failed to insert record: %v", err)
+		}
 		k := int32(math.Round(rand.Float64() * 50))
-		s1.SetInt("A", k)
-		s1.SetString("B", fmt.Sprintf("rec%d", k))
+		if err := s1.SetInt("A", k); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := s1.SetString("B", fmt.Sprintf("rec%d", k)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 	}
 	s1.Close()
 
@@ -68,12 +77,17 @@ func TestScan1(t *testing.T) {
 		}
 	}
 	s4.Close()
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }
 
 func TestScan2(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "scantest2"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 
 	sch1 := record.NewSchema()
 	sch1.AddIntField("A")
@@ -88,9 +102,15 @@ func TestScan2(t *testing.T) {
 	}
 	t.Logf("inserting %d random records int T1.", n)
 	for i := 0; i < n; i++ {
-		us1.Insert()
-		us1.SetInt("A", int32(i))
-		us1.SetString("B", fmt.Sprintf("bbb%d", i))
+		if err := us1.Insert(); err != nil {
+			t.Fatalf("failed to insert record: %v", err)
+		}
+		if err := us1.SetInt("A", int32(i)); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := us1.SetString("B", fmt.Sprintf("bbb%d", i)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 	}
 	us1.Close()
 
@@ -104,15 +124,21 @@ func TestScan2(t *testing.T) {
 	}
 	t.Logf("inserting %d random records into T2.", n)
 	for i := 0; i < n; i++ {
-		us2.Insert()
-		us2.SetInt("C", int32(n-i-1))
-		us2.SetString("D", fmt.Sprintf("ddd%d", n-i-1))
+		if err := us2.Insert(); err != nil {
+			t.Fatalf("failed to insert record: %v", err)
+		}
+		if err := us2.SetInt("C", int32(n-i-1)); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := us2.SetString("D", fmt.Sprintf("ddd%d", n-i-1)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 	}
 	us2.Close()
 
 	s1, _ := record.NewTableScan(tx, "T1", layout1)
 	s2, _ := record.NewTableScan(tx, "T2", layout2)
-	s3 := query.NewProductScan(s1, s2)
+	s3, _ := query.NewProductScan(s1, s2)
 
 	term := query.NewTerm(query.NewExpressionFromField("A"), query.NewExpressionFromField("C"))
 	pred := query.NewPredicateFromTerm(term)
@@ -142,5 +168,7 @@ func TestScan2(t *testing.T) {
 		}
 	}
 	s5.Close()
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

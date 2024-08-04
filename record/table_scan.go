@@ -27,16 +27,19 @@ func NewTableScan(tx *tx.Transaction, tableName string, layout *Layout) (*TableS
 		return nil, fmt.Errorf("failed to get file size: %v", err)
 	}
 	if fileSize == 0 {
-		ts.moveToNewBlock()
+		if err := ts.moveToNewBlock(); err != nil {
+			return nil, err
+		}
 	} else {
-		ts.moveToBlock(0)
+		if err := ts.moveToBlock(0); err != nil {
+			return nil, err
+		}
 	}
 	return ts, nil
 }
 
 func (ts *TableScan) BeforeFirst() error {
-	ts.moveToBlock(0)
-	return nil
+	return ts.moveToBlock(0)
 }
 
 func (ts *TableScan) Next() (bool, error) {
@@ -53,7 +56,9 @@ func (ts *TableScan) Next() (bool, error) {
 		if atLastBlock {
 			return false, nil
 		}
-		ts.moveToBlock(ts.rp.Block().Number() + 1)
+		if err := ts.moveToBlock(ts.rp.Block().Number() + 1); err != nil {
+			return false, err
+		}
 		currentSlot, err = ts.rp.NextAfter(ts.currentSlot)
 		if err != nil {
 			return false, fmt.Errorf("failed to get next slot: %v", err)
@@ -132,9 +137,13 @@ func (ts *TableScan) Insert() error {
 			return fmt.Errorf("failed to check if at last block: %v", err)
 		}
 		if atLastBlock {
-			ts.moveToNewBlock()
+			if err := ts.moveToNewBlock(); err != nil {
+				return err
+			}
 		} else {
-			ts.moveToBlock(ts.rp.Block().Number() + 1)
+			if err := ts.moveToBlock(ts.rp.Block().Number() + 1); err != nil {
+				return err
+			}
 		}
 		currentSlot, err = ts.rp.InsertAfter(ts.currentSlot)
 		if err != nil {
@@ -149,22 +158,33 @@ func (ts *TableScan) Delete() error {
 	return ts.rp.Delete(ts.currentSlot)
 }
 
-func (ts *TableScan) MoveToRID(rid *RID) {
+func (ts *TableScan) MoveToRID(rid *RID) error {
 	ts.Close()
 	block := file.NewBlockID(ts.filename, rid.BlockNumber())
-	ts.rp = NewRecordPage(ts.tx, block, ts.layout)
+
+	var err error
+	ts.rp, err = NewRecordPage(ts.tx, block, ts.layout)
+	if err != nil {
+		return err
+	}
 	ts.currentSlot = rid.Slot()
+	return nil
 }
 
 func (ts *TableScan) GetRID() *RID {
 	return NewRID(ts.rp.Block().Number(), ts.currentSlot)
 }
 
-func (ts *TableScan) moveToBlock(blockNum int32) {
+func (ts *TableScan) moveToBlock(blockNum int32) error {
 	ts.Close()
 	block := file.NewBlockID(ts.filename, blockNum)
-	ts.rp = NewRecordPage(ts.tx, block, ts.layout)
+	var err error
+	ts.rp, err = NewRecordPage(ts.tx, block, ts.layout)
+	if err != nil {
+		return err
+	}
 	ts.currentSlot = -1
+	return nil
 }
 
 func (ts *TableScan) moveToNewBlock() error {
@@ -173,8 +193,13 @@ func (ts *TableScan) moveToNewBlock() error {
 	if err != nil {
 		return fmt.Errorf("failed to append block: %v", err)
 	}
-	ts.rp = NewRecordPage(ts.tx, block, ts.layout)
-	ts.rp.Format()
+	ts.rp, err = NewRecordPage(ts.tx, block, ts.layout)
+	if err != nil {
+		return err
+	}
+	if err := ts.rp.Format(); err != nil {
+		return err
+	}
 	ts.currentSlot = -1
 	return nil
 }

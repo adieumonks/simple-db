@@ -9,10 +9,12 @@ type ProductScan struct {
 	s2 Scan
 }
 
-func NewProductScan(s1, s2 Scan) *ProductScan {
+func NewProductScan(s1, s2 Scan) (*ProductScan, error) {
 	ps := &ProductScan{s1: s1, s2: s2}
-	ps.BeforeFirst()
-	return ps
+	if err := ps.BeforeFirst(); err != nil {
+		return nil, err
+	}
+	return ps, nil
 }
 
 func (ps *ProductScan) BeforeFirst() error {

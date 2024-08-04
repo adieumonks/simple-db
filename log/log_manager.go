@@ -95,7 +95,9 @@ func (lm *LogManager) appendNewBlock() (file.BlockID, error) {
 		return file.BlockID{}, fmt.Errorf("failed to append new block: %w", err)
 	}
 	lm.logPage.SetInt(0, lm.fm.BlockSize())
-	lm.fm.Write(block, lm.logPage)
+	if err := lm.fm.Write(block, lm.logPage); err != nil {
+		return file.BlockID{}, err
+	}
 	return block, nil
 }
 

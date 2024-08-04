@@ -12,7 +12,10 @@ import (
 
 func TestRecord(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "recordtest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 
 	sch := record.NewSchema()
 	sch.AddIntField("A")
@@ -24,10 +27,17 @@ func TestRecord(t *testing.T) {
 	}
 
 	block, _ := tx.Append("testfile")
-	tx.Pin(block)
+	if err := tx.Pin(block); err != nil {
+		t.Fatalf("failed to pin block: %v", err)
+	}
 
-	rp := record.NewRecordPage(tx, block, layout)
-	rp.Format()
+	rp, err := record.NewRecordPage(tx, block, layout)
+	if err != nil {
+		t.Fatalf("failed to create record page: %v", err)
+	}
+	if err := rp.Format(); err != nil {
+		t.Fatalf("failed to format record page: %v", err)
+	}
 
 	t.Log("filling the page with random records.")
 	slot, err := rp.InsertAfter(-1)
@@ -36,8 +46,12 @@ func TestRecord(t *testing.T) {
 	}
 	for slot >= 0 {
 		n := int32(math.Round(rand.Float64() * 50))
-		rp.SetInt(slot, "A", n)
-		rp.SetString(slot, "B", "rec"+string(n))
+		if err := rp.SetInt(slot, "A", n); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := rp.SetString(slot, "B", "rec"+string(n)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 		t.Logf("inserting into slot %d: {%d, rec%d}\n", slot, n, n)
 		slot, err = rp.InsertAfter(slot)
 		if err != nil {
@@ -97,5 +111,7 @@ func TestRecord(t *testing.T) {
 	}
 
 	tx.Unpin(block)
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit transaction: %v", err)
+	}
 }

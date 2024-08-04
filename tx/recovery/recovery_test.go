@@ -33,49 +33,96 @@ func TestRecovery(t *testing.T) {
 }
 
 func initialize(t *testing.T) {
-	tx1 := db.NewTransaction()
-	tx2 := db.NewTransaction()
-	tx1.Pin(b0)
-	tx2.Pin(b1)
+	tx1, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	tx2, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	if err := tx1.Pin(b0); err != nil {
+		t.Fatal("failed to pin block")
+	}
+	if err := tx2.Pin(b1); err != nil {
+		t.Fatal("failed to pin block")
+	}
 	pos := int32(0)
 	for i := 0; i < 6; i++ {
-		tx1.SetInt(b0, pos, pos, false)
-		tx2.SetInt(b1, pos, pos, false)
+		if err := tx1.SetInt(b0, pos, pos, false); err != nil {
+			t.Fatal("failed to set int")
+		}
+		if err := tx2.SetInt(b1, pos, pos, false); err != nil {
+			t.Fatal("failed to set int")
+		}
 		pos += file.Int32Bytes
 	}
-	tx1.SetString(b0, 30, "abc", false)
-	tx2.SetString(b1, 30, "def", false)
-	tx1.Commit()
-	tx2.Commit()
+	if err := tx1.SetString(b0, 30, "abc", false); err != nil {
+		t.Fatal("failed to set string")
+	}
+	if err := tx2.SetString(b1, 30, "def", false); err != nil {
+		t.Fatal("failed to set string")
+	}
+	if err := tx1.Commit(); err != nil {
+		t.Fatalf("failed to commit transaction: %v", err)
+	}
+	if err := tx2.Commit(); err != nil {
+		t.Fatalf("failed to commit transaction: %v", err)
+	}
 	printValues(t, "After Initialization")
 }
 
 func modify(t *testing.T) {
-	tx3 := db.NewTransaction()
-	tx4 := db.NewTransaction()
-	tx3.Pin(b0)
-	tx4.Pin(b1)
+	tx3, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	tx4, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	if err := tx3.Pin(b0); err != nil {
+		t.Fatal("failed to pin block")
+	}
+	if err := tx4.Pin(b1); err != nil {
+		t.Fatal("failed to pin block")
+	}
 	pos := int32(0)
 	for i := 0; i < 6; i++ {
-		tx3.SetInt(b0, pos, int32(100+i), true)
-		tx4.SetInt(b1, pos, int32(100+i), true)
+		if err := tx3.SetInt(b0, pos, int32(100+i), true); err != nil {
+			t.Fatal("failed to set int")
+		}
+		if err := tx4.SetInt(b1, pos, int32(100+i), true); err != nil {
+			t.Fatal("failed to set int")
+		}
 		pos += file.Int32Bytes
 	}
-	tx3.SetString(b0, 30, "uvw", true)
-	tx4.SetString(b1, 30, "xyz", true)
+	if err := tx3.SetString(b0, 30, "uvw", true); err != nil {
+		t.Fatal("failed to set string")
+	}
+	if err := tx4.SetString(b1, 30, "xyz", true); err != nil {
+		t.Fatal("failed to set string")
+	}
 	bm.FlushAll(3)
 	bm.FlushAll(4)
 	printValues(t, "After Modification")
 
-	tx3.Rollback()
+	if err := tx3.Rollback(); err != nil {
+		t.Fatalf("failed to rollback transaction: %v", err)
+	}
 	printValues(t, "After Rollback")
 	// tx4 stops here without committing or rolling back,
 	// so all its changes should be undone by recovery
 }
 
 func recovery(t *testing.T) {
-	tx := db.NewTransaction()
-	tx.Recover()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	if err := tx.Recover(); err != nil {
+		t.Fatalf("failed to recover: %v", err)
+	}
 	printValues(t, "After Recovery")
 }
 
@@ -83,8 +130,12 @@ func printValues(t *testing.T, msg string) {
 	t.Log(msg)
 	p0 := file.NewPage(fm.BlockSize())
 	p1 := file.NewPage(fm.BlockSize())
-	fm.Read(b0, p0)
-	fm.Read(b1, p1)
+	if err := fm.Read(b0, p0); err != nil {
+		t.Fatal("failed to read block")
+	}
+	if err := fm.Read(b1, p1); err != nil {
+		t.Fatal("failed to read block")
+	}
 	pos := int32(0)
 	for i := 0; i < 6; i++ {
 		t.Logf("%d ", p0.GetInt(pos))

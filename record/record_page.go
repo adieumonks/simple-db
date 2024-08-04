@@ -18,9 +18,11 @@ type RecordPage struct {
 	layout *Layout
 }
 
-func NewRecordPage(tx *tx.Transaction, block file.BlockID, layout *Layout) *RecordPage {
-	tx.Pin(block)
-	return &RecordPage{tx, block, layout}
+func NewRecordPage(tx *tx.Transaction, block file.BlockID, layout *Layout) (*RecordPage, error) {
+	if err := tx.Pin(block); err != nil {
+		return nil, err
+	}
+	return &RecordPage{tx, block, layout}, nil
 }
 
 func (rp *RecordPage) GetInt(slot int32, fieldName string) (int32, error) {
@@ -67,21 +69,28 @@ func (rp *RecordPage) Delete(slot int32) error {
 	return nil
 }
 
-func (rp *RecordPage) Format() {
+func (rp *RecordPage) Format() error {
 	slot := int32(0)
 	for rp.isValidSlot(slot) {
-		rp.tx.SetInt(rp.block, rp.offset(slot), EMPTY, false)
+		if err := rp.tx.SetInt(rp.block, rp.offset(slot), EMPTY, false); err != nil {
+			return err
+		}
 		sch := rp.layout.Schema()
 		for _, fieldName := range sch.Fields() {
 			fpos := rp.offset(slot) + rp.layout.Offset(fieldName)
 			if sch.Type(fieldName) == INTEGER {
-				rp.tx.SetInt(rp.block, fpos, 0, false)
+				if err := rp.tx.SetInt(rp.block, fpos, 0, false); err != nil {
+					return err
+				}
 			} else {
-				rp.tx.SetString(rp.block, fpos, "", false)
+				if err := rp.tx.SetString(rp.block, fpos, "", false); err != nil {
+					return err
+				}
 			}
 		}
 		slot++
 	}
+	return nil
 }
 
 func (rp *RecordPage) NextAfter(slot int32) (int32, error) {

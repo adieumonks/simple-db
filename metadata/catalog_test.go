@@ -11,7 +11,10 @@ import (
 
 func TestCatalog(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "catalogtest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 	tm, err := metadata.NewTableManager(true, tx)
 	if err != nil {
 		t.Fatalf("failed to create table manager: %v", err)
@@ -81,5 +84,7 @@ func TestCatalog(t *testing.T) {
 		}
 	}
 	ts.Close()
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

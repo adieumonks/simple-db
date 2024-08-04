@@ -12,7 +12,10 @@ import (
 
 func TestTableScan(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "tabletest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 
 	sch := record.NewSchema()
 	sch.AddIntField("A")
@@ -52,7 +55,9 @@ func TestTableScan(t *testing.T) {
 
 	t.Logf("deleting these records, whose A-values are less than 25.")
 	count := int32(0)
-	ts.BeforeFirst()
+	if err := ts.BeforeFirst(); err != nil {
+		t.Fatalf("failed to move to before first: %v", err)
+	}
 	for {
 		hasNext, err := ts.Next()
 		if err != nil {
@@ -82,7 +87,9 @@ func TestTableScan(t *testing.T) {
 	t.Logf("%d values under 25 were deleted\n", count)
 
 	t.Log("Here are the remianing records.")
-	ts.BeforeFirst()
+	if err := ts.BeforeFirst(); err != nil {
+		t.Fatalf("failed to move to before first: %v", err)
+	}
 	for {
 		hasNext, err := ts.Next()
 		if err != nil {
@@ -104,5 +111,7 @@ func TestTableScan(t *testing.T) {
 	}
 
 	ts.Close()
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

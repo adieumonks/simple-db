@@ -65,10 +65,16 @@ func (bm *BufferManager) Pin(block file.BlockID) (*Buffer, error) {
 	defer bm.cond.L.Unlock()
 
 	timestamp := time.Now()
-	buffer := bm.tryToPin(block)
+	buffer, err := bm.tryToPin(block)
+	if err != nil {
+		return nil, err
+	}
 	for buffer == nil && !bm.waitTooLong(timestamp) {
 		util.Wait(bm.cond, MAX_TIME)
-		buffer = bm.tryToPin(block)
+		buffer, err = bm.tryToPin(block)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if buffer == nil {
 		return nil, ErrBufferAbort
@@ -80,20 +86,22 @@ func (bm *BufferManager) waitTooLong(startTime time.Time) bool {
 	return time.Since(startTime) > MAX_TIME
 }
 
-func (bm *BufferManager) tryToPin(block file.BlockID) *Buffer {
+func (bm *BufferManager) tryToPin(block file.BlockID) (*Buffer, error) {
 	buffer := bm.findExistingBuffer(block)
 	if buffer == nil {
 		buffer = bm.chooseUnpinnedBuffer()
 		if buffer == nil {
-			return nil
+			return nil, nil
 		}
-		buffer.AssignToBlock(block)
+		if err := buffer.AssignToBlock(block); err != nil {
+			return nil, err
+		}
 	}
 	if !buffer.IsPinned() {
 		bm.numAvailable--
 	}
 	buffer.Pin()
-	return buffer
+	return buffer, nil
 }
 
 func (bm *BufferManager) findExistingBuffer(block file.BlockID) *Buffer {

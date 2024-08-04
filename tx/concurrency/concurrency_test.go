@@ -39,57 +39,99 @@ func TestConcurrency(t *testing.T) {
 func runTransactionA(t *testing.T) {
 	defer wg.Done()
 
-	tx := tx.NewTransaction(fm, lm, bm)
+	tx, err := tx.NewTransaction(fm, lm, bm)
+	if err != nil {
+		t.Errorf("failed to create new transaction: %v", err)
+	}
 	b1 := file.NewBlockID("testfile", 1)
 	b2 := file.NewBlockID("testfile", 2)
-	tx.Pin(b1)
-	tx.Pin(b2)
+	if err := tx.Pin(b1); err != nil {
+		t.Errorf("Tx A: failed to pin block: %v", err)
+	}
+	if err := tx.Pin(b2); err != nil {
+		t.Errorf("Tx A: failed to pin block: %v", err)
+	}
 	t.Log("Tx A: request slock 1")
-	tx.GetInt(b1, 0)
+	if _, err := tx.GetInt(b1, 0); err != nil {
+		t.Errorf("Tx A: failed to get int: %v", err)
+	}
 	t.Log("Tx A: receive slock 1")
 	time.Sleep(1 * time.Second)
 	t.Log("Tx A: request slock 2")
-	tx.GetInt(b2, 0)
+	if _, err := tx.GetInt(b2, 0); err != nil {
+		t.Errorf("Tx A: failed to get int: %v", err)
+	}
 	t.Log("Tx A: receive slock 2")
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Errorf("Tx A: failed to commit: %v", err)
+	}
 	t.Log("Tx A: commit")
 }
 
 func runTransactionB(t *testing.T) {
 	defer wg.Done()
 
-	tx := tx.NewTransaction(fm, lm, bm)
+	tx, err := tx.NewTransaction(fm, lm, bm)
+	if err != nil {
+		t.Errorf("failed to create new transaction: %v", err)
+		return
+	}
 	b1 := file.NewBlockID("testfile", 1)
 	b2 := file.NewBlockID("testfile", 2)
-	tx.Pin(b1)
-	tx.Pin(b2)
+	if err := tx.Pin(b1); err != nil {
+		t.Errorf("Tx B: failed to pin block: %v", err)
+	}
+	if err := tx.Pin(b2); err != nil {
+		t.Errorf("Tx B: failed to pin block: %v", err)
+	}
 	t.Log("Tx B: request xlock 2")
-	tx.SetInt(b2, 0, 0, false)
+	if err := tx.SetInt(b2, 0, 0, false); err != nil {
+		t.Errorf("Tx B: failed to set int: %v", err)
+		return
+	}
 	t.Log("Tx B: receive xlock 2")
 	time.Sleep(1 * time.Second)
 	t.Log("Tx B: request slock 1")
-	tx.GetInt(b2, 0)
+	if _, err := tx.GetInt(b2, 0); err != nil {
+		t.Errorf("Tx B: failed to get int: %v", err)
+		return
+	}
 	t.Log("Tx B: receive slock 1")
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Errorf("Tx B: failed to commit: %v", err)
+	}
 	t.Log("Tx B: commit")
 }
 
 func runTransactionC(t *testing.T) {
 	defer wg.Done()
 
-	tx := tx.NewTransaction(fm, lm, bm)
+	tx, err := tx.NewTransaction(fm, lm, bm)
+	if err != nil {
+		t.Errorf("failed to create new transaction: %v", err)
+	}
 	b1 := file.NewBlockID("testfile", 1)
 	b2 := file.NewBlockID("testfile", 2)
-	tx.Pin(b1)
-	tx.Pin(b2)
+	if err := tx.Pin(b1); err != nil {
+		t.Errorf("Tx C: failed to pin block: %v", err)
+	}
+	if err := tx.Pin(b2); err != nil {
+		t.Errorf("Tx C: failed to pin block: %v", err)
+	}
 	time.Sleep(500 * time.Millisecond)
 	t.Log("Tx C: request xlock 1")
-	tx.SetInt(b1, 0, 0, false)
+	if err := tx.SetInt(b1, 0, 0, false); err != nil {
+		t.Errorf("Tx C: failed to set int: %v", err)
+	}
 	t.Log("Tx C: receive xlock 1")
 	time.Sleep(1 * time.Second)
 	t.Log("Tx C: request slock 2")
-	tx.GetInt(b2, 0)
+	if _, err := tx.GetInt(b2, 0); err != nil {
+		t.Errorf("Tx C: failed to get int: %v", err)
+	}
 	t.Log("Tx C: receive slock 2")
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Errorf("Tx C: failed to commit: %v", err)
+	}
 	t.Log("Tx C: commit")
 }

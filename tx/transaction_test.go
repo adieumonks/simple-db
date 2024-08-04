@@ -15,17 +15,33 @@ func TestTx(t *testing.T) {
 	lm := db.LogManager()
 	bm := db.BufferManager()
 
-	tx1 := tx.NewTransaction(fm, lm, bm)
+	tx1, err := tx.NewTransaction(fm, lm, bm)
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 	block := file.NewBlockID("testfile", 1)
-	tx1.Pin(block)
+	if err := tx1.Pin(block); err != nil {
+		t.Fatalf("failed to pin block: %v", err)
+	}
 	// The block initially contains unknown bytes
 	// so don't log those values here.
-	tx1.SetInt(block, 80, 1, false)
-	tx1.SetString(block, 40, "one", false)
-	tx1.Commit()
+	if err := tx1.SetInt(block, 80, 1, false); err != nil {
+		t.Fatalf("failed to set int: %v", err)
+	}
+	if err := tx1.SetString(block, 40, "one", false); err != nil {
+		t.Fatalf("failed to set string: %v", err)
+	}
+	if err := tx1.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 
-	tx2 := tx.NewTransaction(fm, lm, bm)
-	tx2.Pin(block)
+	tx2, err := tx.NewTransaction(fm, lm, bm)
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	if err := tx2.Pin(block); err != nil {
+		t.Fatalf("failed to pin block: %v", err)
+	}
 	ival, _ := tx2.GetInt(block, 80)
 	sval, _ := tx2.GetString(block, 40)
 	t.Logf("initial value at location 80 = %d", ival)
@@ -33,24 +49,46 @@ func TestTx(t *testing.T) {
 
 	newival := ival + 1
 	newsval := sval + "!"
-	tx2.SetInt(block, 80, newival, true)
-	tx2.SetString(block, 40, newsval, true)
-	tx2.Commit()
+	if err := tx2.SetInt(block, 80, newival, true); err != nil {
+		t.Fatalf("failed to set int: %v", err)
+	}
+	if err := tx2.SetString(block, 40, newsval, true); err != nil {
+		t.Fatalf("failed to set string: %v", err)
+	}
+	if err := tx2.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 
-	tx3 := tx.NewTransaction(fm, lm, bm)
-	tx3.Pin(block)
+	tx3, err := tx.NewTransaction(fm, lm, bm)
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	if err := tx3.Pin(block); err != nil {
+		t.Fatalf("failed to pin block: %v", err)
+	}
 	ival, _ = tx3.GetInt(block, 80)
 	sval, _ = tx3.GetString(block, 40)
 	t.Logf("new value at location 80 = %d", ival)
 	t.Logf("new value at location 40 = %s", sval)
-	tx3.SetInt(block, 80, 9999, true)
+	if err := tx3.SetInt(block, 80, 9999, true); err != nil {
+		t.Fatalf("failed to set int: %v", err)
+	}
 	ival, _ = tx3.GetInt(block, 80)
 	t.Logf("pre-rollback value at location 80 = %d", ival)
-	tx3.Rollback()
+	if err := tx3.Rollback(); err != nil {
+		t.Fatalf("failed to rollback: %v", err)
+	}
 
-	tx4 := tx.NewTransaction(fm, lm, bm)
-	tx4.Pin(block)
+	tx4, err := tx.NewTransaction(fm, lm, bm)
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	if err := tx4.Pin(block); err != nil {
+		t.Fatalf("failed to pin block: %v", err)
+	}
 	ival, _ = tx4.GetInt(block, 80)
 	t.Logf("post-rollback value at location 80 = %d", ival)
-	tx4.Commit()
+	if err := tx4.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

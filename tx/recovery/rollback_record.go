@@ -32,7 +32,9 @@ func (r *RollbackRecord) TxNumber() int32 {
 	return r.txnum
 }
 
-func (r *RollbackRecord) Undo(tx Transaction) {}
+func (r *RollbackRecord) Undo(tx Transaction) error {
+	return nil
+}
 
 func (r *RollbackRecord) String() string {
 	return fmt.Sprintf("<ROLLBACK %d>", r.txnum)

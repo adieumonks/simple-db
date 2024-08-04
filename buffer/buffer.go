@@ -48,19 +48,25 @@ func (b *Buffer) ModifyingTx() int32 {
 	return b.txnum
 }
 
-func (b *Buffer) AssignToBlock(block file.BlockID) {
+func (b *Buffer) AssignToBlock(block file.BlockID) error {
 	b.Flush()
 	b.block = block
-	b.fm.Read(block, b.contents)
+	if err := b.fm.Read(block, b.contents); err != nil {
+		return err
+	}
 	b.pins = 0
+	return nil
 }
 
-func (b *Buffer) Flush() {
+func (b *Buffer) Flush() error {
 	if b.txnum >= 0 {
 		b.lm.Flush(b.lsn)
-		b.fm.Write(b.block, b.contents)
+		if err := b.fm.Write(b.block, b.contents); err != nil {
+			return err
+		}
 		b.txnum = -1
 	}
+	return nil
 }
 
 func (b *Buffer) Pin() {

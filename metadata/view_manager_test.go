@@ -11,7 +11,10 @@ import (
 
 func TestViewManager(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "viewmanagertest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 	tm, err := metadata.NewTableManager(true, tx)
 	if err != nil {
 		t.Fatalf("failed to create table manager: %v", err)
@@ -22,7 +25,9 @@ func TestViewManager(t *testing.T) {
 		t.Fatalf("failed to create view manager: %v", err)
 	}
 
-	vm.CreateView("MyView", "SELECT A, B FROM MyTable", tx)
+	if err := vm.CreateView("MyView", "SELECT A, B FROM MyTable", tx); err != nil {
+		t.Fatalf("failed to create view: %v", err)
+	}
 
 	layout, err := tm.GetLayout("viewcat", tx)
 	if err != nil {
@@ -59,5 +64,7 @@ func TestViewManager(t *testing.T) {
 	}
 	t.Logf("viewDef: %s", viewDef)
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

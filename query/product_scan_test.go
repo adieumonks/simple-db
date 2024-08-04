@@ -12,7 +12,10 @@ import (
 
 func TestProductScan(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "productscantest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 
 	sch1 := record.NewSchema()
 	sch1.AddIntField("A")
@@ -28,27 +31,43 @@ func TestProductScan(t *testing.T) {
 
 	n := 200
 
-	ts1.BeforeFirst()
+	if err := ts1.BeforeFirst(); err != nil {
+		t.Fatalf("failed to prepare for first")
+	}
 	t.Logf("inserting %d records into T1.", n)
 	for i := 0; i < n; i++ {
-		ts1.Insert()
-		ts1.SetInt("A", int32(i))
-		ts1.SetString("B", fmt.Sprintf("aaa%d", i))
+		if err := ts1.Insert(); err != nil {
+			t.Fatalf("failed to insert record: %v", err)
+		}
+		if err := ts1.SetInt("A", int32(i)); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := ts1.SetString("B", fmt.Sprintf("aaa%d", i)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 	}
 	ts1.Close()
 
-	ts2.BeforeFirst()
+	if err := ts2.BeforeFirst(); err != nil {
+		t.Fatalf("failed to prepare for first")
+	}
 	t.Logf("inserting %d records into T2.", n)
 	for i := 0; i < n; i++ {
-		ts2.Insert()
-		ts2.SetInt("C", int32(n-i-1))
-		ts2.SetString("D", fmt.Sprintf("bbb%d", n-i-1))
+		if err := ts2.Insert(); err != nil {
+			t.Fatalf("failed to insert record: %v", err)
+		}
+		if err := ts2.SetInt("C", int32(n-i-1)); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := ts2.SetString("D", fmt.Sprintf("bbb%d", n-i-1)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 	}
 	ts2.Close()
 
 	s1, _ := record.NewTableScan(tx, "T1", layout1)
 	s2, _ := record.NewTableScan(tx, "T2", layout2)
-	s3 := query.NewProductScan(s1, s2)
+	s3, _ := query.NewProductScan(s1, s2)
 
 	next, err := s3.Next()
 	if err != nil {
@@ -79,5 +98,7 @@ func TestProductScan(t *testing.T) {
 		}
 	}
 	s3.Close()
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

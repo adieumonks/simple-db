@@ -19,7 +19,9 @@ func (r *CheckPointRecord) TxNumber() int32 {
 	return -1
 }
 
-func (r *CheckPointRecord) Undo(tx Transaction) {}
+func (r *CheckPointRecord) Undo(tx Transaction) error {
+	return nil
+}
 
 func (r *CheckPointRecord) String() string {
 	return "<CHECKPOINT>"

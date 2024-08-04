@@ -14,7 +14,10 @@ import (
 
 func TestMetadataManager(t *testing.T) {
 	db, _ := server.NewSimpleDB(path.Join(t.TempDir(), "metadatamanagertest"), 400, 8)
-	tx := db.NewTransaction()
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
 	mm, err := metadata.NewMetadataManager(true, tx)
 	if err != nil {
 		t.Fatalf("failed to create table manager: %v", err)
@@ -53,10 +56,16 @@ func TestMetadataManager(t *testing.T) {
 		t.Fatalf("failed to create table scan: %v", err)
 	}
 	for i := 0; i < 50; i++ {
-		ts.Insert()
+		if err := ts.Insert(); err != nil {
+			t.Fatalf("failed to insert: %v", err)
+		}
 		n := int32(math.Round(rand.Float64() * 50))
-		ts.SetInt("A", n)
-		ts.SetString("B", fmt.Sprintf("rec%d", n))
+		if err := ts.SetInt("A", n); err != nil {
+			t.Fatalf("failed to set int: %v", err)
+		}
+		if err := ts.SetString("B", fmt.Sprintf("rec%d", n)); err != nil {
+			t.Fatalf("failed to set string: %v", err)
+		}
 	}
 	si, err := mm.GetStatInfo("MyTable", layout, tx)
 	if err != nil {
@@ -110,5 +119,7 @@ func TestMetadataManager(t *testing.T) {
 	t.Logf("V(indexB, A) = %d", ii.DistinctValues("A"))
 	t.Logf("V(indexB, B) = %d", ii.DistinctValues("B"))
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit: %v", err)
+	}
 }

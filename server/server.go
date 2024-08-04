@@ -39,7 +39,7 @@ func NewSimpleDB(dirname string, blockSize, buffferSize int32) (*SimpleDB, error
 	}, nil
 }
 
-func (db *SimpleDB) NewTransaction() *tx.Transaction {
+func (db *SimpleDB) NewTransaction() (*tx.Transaction, error) {
 	return tx.NewTransaction(db.fm, db.lm, db.bm)
 }
 

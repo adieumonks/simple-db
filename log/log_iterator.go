@@ -35,15 +35,17 @@ func (it *LogIterator) HasNext() bool {
 	return it.curentPos < it.fm.BlockSize() || it.block.Number() > 0
 }
 
-func (it *LogIterator) Next() []byte {
+func (it *LogIterator) Next() ([]byte, error) {
 	if it.curentPos == it.fm.BlockSize() {
 		it.block = file.NewBlockID(it.block.Filename(), it.block.Number()-1)
-		it.moveToBlock(it.block)
+		if err := it.moveToBlock(it.block); err != nil {
+			return nil, err
+		}
 	}
 
 	rec := it.page.GetBytes(it.curentPos)
 	it.curentPos += file.Int32Bytes + int32(len(rec))
-	return rec
+	return rec, nil
 }
 
 func (it *LogIterator) moveToBlock(block file.BlockID) error {

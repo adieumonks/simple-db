@@ -34,7 +34,10 @@ func printLogRecords(t *testing.T, lm *log.LogManager, msg string) {
 	}
 
 	for iter.HasNext() {
-		record := iter.Next()
+		record, err := iter.Next()
+		if err != nil {
+			t.Fatalf("failed to get next record: %v", err)
+		}
 		p := file.NewPageFromBytes(record)
 		s := p.GetString(0)
 		npos := file.MaxLength(int32(len(s)))

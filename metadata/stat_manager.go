@@ -32,7 +32,9 @@ func (sm *StatManager) GetStatInfo(tableName string, layout *record.Layout, tx *
 
 	sm.numCalls++
 	if sm.numCalls > 100 {
-		sm.refreshStatics(tx)
+		if err := sm.refreshStatics(tx); err != nil {
+			return nil, err
+		}
 	}
 
 	var si *StatInfo
