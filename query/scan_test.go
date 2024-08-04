@@ -42,7 +42,7 @@ func TestScan1(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}
-	c := record.NewConstantFromInt(10)
+	c := record.NewConstantWithInt(10)
 	term := query.NewTerm(query.NewExpressionFromField("A"), query.NewExpressionFromConstant(c))
 	pred := query.NewPredicateFromTerm(term)
 	t.Logf("the predicate is %v", pred)

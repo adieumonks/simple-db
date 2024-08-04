@@ -1,6 +1,8 @@
 package query
 
-import "strings"
+import (
+	"strings"
+)
 
 type Predicate struct {
 	terms []*Term

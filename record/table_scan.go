@@ -77,13 +77,13 @@ func (ts *TableScan) GetVal(fieldName string) (*Constant, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to get int value: %v", err)
 		}
-		return NewConstantFromInt(val), nil
+		return NewConstantWithInt(val), nil
 	} else {
 		val, err := ts.GetString(fieldName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get string value: %v", err)
 		}
-		return NewConstantFromString(val), nil
+		return NewConstantWithString(val), nil
 	}
 }
 

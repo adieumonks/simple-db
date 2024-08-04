@@ -7,11 +7,11 @@ type Constant struct {
 	sval *string
 }
 
-func NewConstantFromInt(ival int32) *Constant {
+func NewConstantWithInt(ival int32) *Constant {
 	return &Constant{ival: &ival}
 }
 
-func NewConstantFromString(sval string) *Constant {
+func NewConstantWithString(sval string) *Constant {
 	return &Constant{sval: &sval}
 }
 

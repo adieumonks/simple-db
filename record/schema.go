@@ -37,13 +37,13 @@ func (s *Schema) AddStringField(fieldName string, length int32) {
 	s.AddField(fieldName, STRING, length)
 }
 
-func (s *Schema) Add(fieldName string, sch Schema) {
+func (s *Schema) Add(fieldName string, sch *Schema) {
 	fieldType := sch.Type(fieldName)
 	length := sch.Length(fieldName)
 	s.AddField(fieldName, fieldType, length)
 }
 
-func (s *Schema) AddAll(sch Schema) {
+func (s *Schema) AddAll(sch *Schema) {
 	for _, fieldName := range sch.Fields() {
 		s.Add(fieldName, sch)
 	}
