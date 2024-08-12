@@ -46,10 +46,10 @@ func (*CreateIndexData) updateCommand() {}
 type InsertData struct {
 	TableName string
 	Fields    []string
-	Values    []*record.Constant
+	Values    []*query.Constant
 }
 
-func NewInsertData(tableName string, fields []string, values []*record.Constant) *InsertData {
+func NewInsertData(tableName string, fields []string, values []*query.Constant) *InsertData {
 	return &InsertData{TableName: tableName, Fields: fields, Values: values}
 }
 

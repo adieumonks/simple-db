@@ -3,11 +3,11 @@ package query
 import "github.com/adieumonks/simple-db/record"
 
 type Expression struct {
-	val       *record.Constant
+	val       *Constant
 	fieldName *string
 }
 
-func NewExpressionFromConstant(val *record.Constant) *Expression {
+func NewExpressionFromConstant(val *Constant) *Expression {
 	return &Expression{val: val}
 }
 
@@ -15,7 +15,7 @@ func NewExpressionFromField(fieldName string) *Expression {
 	return &Expression{fieldName: &fieldName}
 }
 
-func (e *Expression) Evaluate(scan Scan) (*record.Constant, error) {
+func (e *Expression) Evaluate(scan Scan) (*Constant, error) {
 	if e.val != nil {
 		return e.val, nil
 	}
@@ -26,7 +26,7 @@ func (e *Expression) IsFieldName() bool {
 	return e.fieldName != nil
 }
 
-func (e *Expression) AsConstant() *record.Constant {
+func (e *Expression) AsConstant() *Constant {
 	return e.val
 }
 

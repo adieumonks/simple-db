@@ -22,19 +22,19 @@ func (p *Parser) Field() (string, error) {
 	return p.lex.EatIdentifier()
 }
 
-func (p *Parser) Constant() (*record.Constant, error) {
+func (p *Parser) Constant() (*query.Constant, error) {
 	if p.lex.MatchStringConstant() {
 		value, err := p.lex.EatStringConstant()
 		if err != nil {
 			return nil, err
 		}
-		return record.NewConstantWithString(value), nil
+		return query.NewConstantWithString(value), nil
 	} else {
 		value, err := p.lex.EatIntConstant()
 		if err != nil {
 			return nil, err
 		}
-		return record.NewConstantWithInt(value), nil
+		return query.NewConstantWithInt(value), nil
 	}
 }
 
@@ -305,8 +305,8 @@ func (p *Parser) fieldList() ([]string, error) {
 	return fields, nil
 }
 
-func (p *Parser) constList() ([]*record.Constant, error) {
-	values := []*record.Constant{}
+func (p *Parser) constList() ([]*query.Constant, error) {
+	values := []*query.Constant{}
 
 	value, err := p.Constant()
 	if err != nil {

@@ -1,21 +1,22 @@
-package record
+package query
 
 import (
 	"fmt"
 
 	"github.com/adieumonks/simple-db/file"
+	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/tx"
 )
 
 type TableScan struct {
 	tx          *tx.Transaction
-	layout      *Layout
-	rp          *RecordPage
+	layout      *record.Layout
+	rp          *record.RecordPage
 	filename    string
 	currentSlot int32
 }
 
-func NewTableScan(tx *tx.Transaction, tableName string, layout *Layout) (*TableScan, error) {
+func NewTableScan(tx *tx.Transaction, tableName string, layout *record.Layout) (*TableScan, error) {
 	ts := &TableScan{
 		tx:       tx,
 		layout:   layout,
@@ -77,7 +78,7 @@ func (ts *TableScan) GetString(fieldName string) (string, error) {
 }
 
 func (ts *TableScan) GetVal(fieldName string) (*Constant, error) {
-	if ts.layout.Schema().Type(fieldName) == INTEGER {
+	if ts.layout.Schema().Type(fieldName) == record.INTEGER {
 		val, err := ts.GetInt(fieldName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get int value: %v", err)
@@ -111,7 +112,7 @@ func (ts *TableScan) SetString(fieldName string, val string) error {
 }
 
 func (ts *TableScan) SetVal(fieldName string, val *Constant) error {
-	if ts.layout.Schema().Type(fieldName) == INTEGER {
+	if ts.layout.Schema().Type(fieldName) == record.INTEGER {
 		err := ts.SetInt(fieldName, val.AsInt())
 		if err != nil {
 			return fmt.Errorf("failed to set int value: %w", err)
@@ -158,12 +159,12 @@ func (ts *TableScan) Delete() error {
 	return ts.rp.Delete(ts.currentSlot)
 }
 
-func (ts *TableScan) MoveToRID(rid *RID) error {
+func (ts *TableScan) MoveToRID(rid *record.RID) error {
 	ts.Close()
 	block := file.NewBlockID(ts.filename, rid.BlockNumber())
 
 	var err error
-	ts.rp, err = NewRecordPage(ts.tx, block, ts.layout)
+	ts.rp, err = record.NewRecordPage(ts.tx, block, ts.layout)
 	if err != nil {
 		return err
 	}
@@ -171,15 +172,15 @@ func (ts *TableScan) MoveToRID(rid *RID) error {
 	return nil
 }
 
-func (ts *TableScan) GetRID() *RID {
-	return NewRID(ts.rp.Block().Number(), ts.currentSlot)
+func (ts *TableScan) GetRID() *record.RID {
+	return record.NewRID(ts.rp.Block().Number(), ts.currentSlot)
 }
 
 func (ts *TableScan) moveToBlock(blockNum int32) error {
 	ts.Close()
 	block := file.NewBlockID(ts.filename, blockNum)
 	var err error
-	ts.rp, err = NewRecordPage(ts.tx, block, ts.layout)
+	ts.rp, err = record.NewRecordPage(ts.tx, block, ts.layout)
 	if err != nil {
 		return err
 	}
@@ -193,7 +194,7 @@ func (ts *TableScan) moveToNewBlock() error {
 	if err != nil {
 		return fmt.Errorf("failed to append block: %v", err)
 	}
-	ts.rp, err = NewRecordPage(ts.tx, block, ts.layout)
+	ts.rp, err = record.NewRecordPage(ts.tx, block, ts.layout)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-package record_test
+package query_test
 
 import (
 	"math"
@@ -6,6 +6,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/server"
 )
@@ -27,7 +28,7 @@ func TestTableScan(t *testing.T) {
 	}
 
 	t.Log("filling the table with 50 random records.")
-	ts, err := record.NewTableScan(tx, "T", layout)
+	ts, err := query.NewTableScan(tx, "T", layout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}

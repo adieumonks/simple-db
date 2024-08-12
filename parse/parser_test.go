@@ -83,11 +83,11 @@ func TestParserUpdateCmd(t *testing.T) {
 			wantCmd: parse.NewModifyData(
 				"student",
 				"age",
-				query.NewExpressionFromConstant(record.NewConstantWithInt(20)),
+				query.NewExpressionFromConstant(query.NewConstantWithInt(20)),
 				query.NewPredicateFromTerm(
 					query.NewTerm(
 						query.NewExpressionFromField("sid"),
-						query.NewExpressionFromConstant(record.NewConstantWithInt(1)),
+						query.NewExpressionFromConstant(query.NewConstantWithInt(1)),
 					),
 				),
 			),
@@ -106,10 +106,10 @@ func TestParserUpdateCmd(t *testing.T) {
 			wantCmd: parse.NewInsertData(
 				"student",
 				[]string{"sid", "sname", "age"},
-				[]*record.Constant{
-					record.NewConstantWithInt(1),
-					record.NewConstantWithString("John"),
-					record.NewConstantWithInt(20),
+				[]*query.Constant{
+					query.NewConstantWithInt(1),
+					query.NewConstantWithString("John"),
+					query.NewConstantWithInt(20),
 				},
 			),
 			wantError: false,

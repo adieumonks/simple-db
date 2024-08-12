@@ -3,6 +3,7 @@ package hash
 import (
 	"fmt"
 
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/tx"
 )
@@ -15,8 +16,8 @@ type HashIndex struct {
 	tx        *tx.Transaction
 	indexName string
 	layout    *record.Layout
-	searchKey *record.Constant
-	ts        *record.TableScan
+	searchKey *query.Constant
+	ts        *query.TableScan
 }
 
 func NewHashIndex(tx *tx.Transaction, indexName string, layout *record.Layout) *HashIndex {
@@ -27,12 +28,12 @@ func NewHashIndex(tx *tx.Transaction, indexName string, layout *record.Layout) *
 	}
 }
 
-func (hi *HashIndex) BeforeFirst(searchKey *record.Constant) error {
+func (hi *HashIndex) BeforeFirst(searchKey *query.Constant) error {
 	hi.Close()
 	hi.searchKey = searchKey
 	bucket := searchKey.HashCode() % NUM_BUCKETS
 	tableName := fmt.Sprintf("%s%d", hi.indexName, bucket)
-	ts, err := record.NewTableScan(hi.tx, tableName, hi.layout)
+	ts, err := query.NewTableScan(hi.tx, tableName, hi.layout)
 	if err != nil {
 		return fmt.Errorf("failed to create table scan: %w", err)
 	}
@@ -69,7 +70,7 @@ func (hi *HashIndex) GetDataRID() (*record.RID, error) {
 	return record.NewRID(blockNum, id), nil
 }
 
-func (hi *HashIndex) Insert(dataval *record.Constant, dataRID *record.RID) error {
+func (hi *HashIndex) Insert(dataval *query.Constant, dataRID *record.RID) error {
 	err := hi.BeforeFirst(dataval)
 	if err != nil {
 		return fmt.Errorf("failed to search for dataval: %w", err)
@@ -93,7 +94,7 @@ func (hi *HashIndex) Insert(dataval *record.Constant, dataRID *record.RID) error
 	return nil
 }
 
-func (hi *HashIndex) Delete(dataval *record.Constant, dataRID *record.RID) error {
+func (hi *HashIndex) Delete(dataval *query.Constant, dataRID *record.RID) error {
 	err := hi.BeforeFirst(dataval)
 	if err != nil {
 		return fmt.Errorf("failed to search for dataval: %w", err)

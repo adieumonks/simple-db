@@ -3,7 +3,7 @@ package query
 import "github.com/adieumonks/simple-db/record"
 
 type UpdateScan interface {
-	SetVal(fieldName string, val *record.Constant) error
+	SetVal(fieldName string, val *Constant) error
 	SetInt(fieldName string, val int32) error
 	SetString(fieldName string, val string) error
 	Insert() error

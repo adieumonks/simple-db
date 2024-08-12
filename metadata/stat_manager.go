@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/tx"
 )
@@ -59,7 +60,7 @@ func (sm *StatManager) refreshStatics(tx *tx.Transaction) error {
 	if err != nil {
 		return fmt.Errorf("failed to get layout: %v", err)
 	}
-	tcat, err := record.NewTableScan(tx, "tblcat", tcatLayout)
+	tcat, err := query.NewTableScan(tx, "tblcat", tcatLayout)
 	if err != nil {
 		return fmt.Errorf("failed to create table scan: %v", err)
 	}
@@ -94,7 +95,7 @@ func (sm *StatManager) refreshStatics(tx *tx.Transaction) error {
 func (sm *StatManager) calcTableStats(tableName string, layout *record.Layout, tx *tx.Transaction) (*StatInfo, error) {
 	numRecords := int32(0)
 	numBlocks := int32(0)
-	ts, err := record.NewTableScan(tx, tableName, layout)
+	ts, err := query.NewTableScan(tx, tableName, layout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create table scan: %v", err)
 	}

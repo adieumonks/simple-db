@@ -3,6 +3,7 @@ package metadata
 import (
 	"fmt"
 
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/tx"
 )
@@ -34,7 +35,7 @@ func (vm *ViewManager) CreateView(viewName string, viewDef string, tx *tx.Transa
 		return fmt.Errorf("failed to get layout: %w", err)
 	}
 
-	ts, err := record.NewTableScan(tx, "viewcat", layout)
+	ts, err := query.NewTableScan(tx, "viewcat", layout)
 	if err != nil {
 		return fmt.Errorf("failed to create table scan: %w", err)
 	}
@@ -61,7 +62,7 @@ func (vm *ViewManager) GetViewDef(viewName string, tx *tx.Transaction) (string, 
 	if err != nil {
 		return "", fmt.Errorf("failed to get layout: %w", err)
 	}
-	ts, err := record.NewTableScan(tx, "viewcat", layout)
+	ts, err := query.NewTableScan(tx, "viewcat", layout)
 	if err != nil {
 		return "", fmt.Errorf("failed to create table scan: %w", err)
 	}

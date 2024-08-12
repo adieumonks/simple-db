@@ -3,6 +3,7 @@ package metadata
 import (
 	"fmt"
 
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/tx"
 )
@@ -46,7 +47,7 @@ func NewTableManager(isNew bool, tx *tx.Transaction) (*TableManager, error) {
 
 func (tm *TableManager) CreateTable(tableName string, schema *record.Schema, tx *tx.Transaction) error {
 	layout := record.NewLayoutFromSchema(schema)
-	tcat, err := record.NewTableScan(tx, "tblcat", tm.tcatLayout)
+	tcat, err := query.NewTableScan(tx, "tblcat", tm.tcatLayout)
 	if err != nil {
 		return fmt.Errorf("failed to create table scan: %w", err)
 	}
@@ -64,7 +65,7 @@ func (tm *TableManager) CreateTable(tableName string, schema *record.Schema, tx 
 	}
 	tcat.Close()
 
-	fcat, err := record.NewTableScan(tx, "fldcat", tm.fcatLayout)
+	fcat, err := query.NewTableScan(tx, "fldcat", tm.fcatLayout)
 	if err != nil {
 		return fmt.Errorf("failed to create table scan: %w", err)
 	}
@@ -100,7 +101,7 @@ func (tm *TableManager) CreateTable(tableName string, schema *record.Schema, tx 
 
 func (tm *TableManager) GetLayout(tableName string, tx *tx.Transaction) (*record.Layout, error) {
 	slotSize := int32(-1)
-	tcat, err := record.NewTableScan(tx, "tblcat", tm.tcatLayout)
+	tcat, err := query.NewTableScan(tx, "tblcat", tm.tcatLayout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create table scan: %w", err)
 	}
@@ -131,7 +132,7 @@ func (tm *TableManager) GetLayout(tableName string, tx *tx.Transaction) (*record
 
 	schema := record.NewSchema()
 	offsets := make(map[string]int32)
-	fcat, err := record.NewTableScan(tx, "fldcat", tm.fcatLayout)
+	fcat, err := query.NewTableScan(tx, "fldcat", tm.fcatLayout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create table scan: %w", err)
 	}

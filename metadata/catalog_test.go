@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/adieumonks/simple-db/metadata"
-	"github.com/adieumonks/simple-db/record"
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/server"
 )
 
@@ -26,7 +26,7 @@ func TestCatalog(t *testing.T) {
 	}
 
 	t.Log("Here are all the tables and their lengths.")
-	ts, err := record.NewTableScan(tx, "tblcat", tcatLayout)
+	ts, err := query.NewTableScan(tx, "tblcat", tcatLayout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestCatalog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get table layout: %v", err)
 	}
-	ts, err = record.NewTableScan(tx, "fldcat", fcatLayout)
+	ts, err = query.NewTableScan(tx, "fldcat", fcatLayout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}

@@ -3,6 +3,7 @@ package metadata
 import (
 	"fmt"
 
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/tx"
 )
@@ -36,7 +37,7 @@ func NewIndexManager(isNew bool, tableManager *TableManager, statManager *StatMa
 }
 
 func (im *IndexManager) CreateIndex(indexName string, tableName string, fieldName string, tx *tx.Transaction) error {
-	ts, err := record.NewTableScan(tx, "idxcat", im.layout)
+	ts, err := query.NewTableScan(tx, "idxcat", im.layout)
 	if err != nil {
 		return fmt.Errorf("failed to create table scan: %w", err)
 	}
@@ -62,7 +63,7 @@ func (im *IndexManager) CreateIndex(indexName string, tableName string, fieldNam
 
 func (im *IndexManager) GetIndexInfo(tableName string, tx *tx.Transaction) (map[string]*IndexInfo, error) {
 	result := make(map[string]*IndexInfo)
-	ts, err := record.NewTableScan(tx, "idxcat", im.layout)
+	ts, err := query.NewTableScan(tx, "idxcat", im.layout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create table scan: %w", err)
 	}

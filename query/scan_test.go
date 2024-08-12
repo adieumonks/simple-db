@@ -23,7 +23,7 @@ func TestScan1(t *testing.T) {
 	sch1.AddIntField("A")
 	sch1.AddStringField("B", 9)
 	layout := record.NewLayoutFromSchema(sch1)
-	s1, err := record.NewTableScan(tx, "T1", layout)
+	s1, err := query.NewTableScan(tx, "T1", layout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}
@@ -47,11 +47,11 @@ func TestScan1(t *testing.T) {
 	}
 	s1.Close()
 
-	s2, err := record.NewTableScan(tx, "T1", layout)
+	s2, err := query.NewTableScan(tx, "T1", layout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}
-	c := record.NewConstantWithInt(10)
+	c := query.NewConstantWithInt(10)
 	term := query.NewTerm(query.NewExpressionFromField("A"), query.NewExpressionFromConstant(c))
 	pred := query.NewPredicateFromTerm(term)
 	t.Logf("the predicate is %v", pred)
@@ -93,7 +93,7 @@ func TestScan2(t *testing.T) {
 	sch1.AddIntField("A")
 	sch1.AddStringField("B", 9)
 	layout1 := record.NewLayoutFromSchema(sch1)
-	us1, _ := record.NewTableScan(tx, "T1", layout1)
+	us1, _ := query.NewTableScan(tx, "T1", layout1)
 
 	n := 200
 
@@ -118,7 +118,7 @@ func TestScan2(t *testing.T) {
 	sch2.AddIntField("C")
 	sch2.AddStringField("D", 9)
 	layout2 := record.NewLayoutFromSchema(sch2)
-	us2, _ := record.NewTableScan(tx, "T2", layout2)
+	us2, _ := query.NewTableScan(tx, "T2", layout2)
 	if err := us2.BeforeFirst(); err != nil {
 		t.Fatalf("failed to prepare for first")
 	}
@@ -136,8 +136,8 @@ func TestScan2(t *testing.T) {
 	}
 	us2.Close()
 
-	s1, _ := record.NewTableScan(tx, "T1", layout1)
-	s2, _ := record.NewTableScan(tx, "T2", layout2)
+	s1, _ := query.NewTableScan(tx, "T1", layout1)
+	s2, _ := query.NewTableScan(tx, "T2", layout2)
 	s3, _ := query.NewProductScan(s1, s2)
 
 	term := query.NewTerm(query.NewExpressionFromField("A"), query.NewExpressionFromField("C"))

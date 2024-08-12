@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/adieumonks/simple-db/metadata"
-	"github.com/adieumonks/simple-db/record"
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/server"
 )
 
@@ -34,7 +34,7 @@ func TestViewManager(t *testing.T) {
 		t.Fatalf("failed to get layout: %v", err)
 	}
 
-	ts, err := record.NewTableScan(tx, "viewcat", layout)
+	ts, err := query.NewTableScan(tx, "viewcat", layout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}

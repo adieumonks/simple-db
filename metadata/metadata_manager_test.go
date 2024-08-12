@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/adieumonks/simple-db/metadata"
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/server"
 )
@@ -51,7 +52,7 @@ func TestMetadataManager(t *testing.T) {
 	}
 
 	// Part 2: Statistics Metadata
-	ts, err := record.NewTableScan(tx, "MyTable", layout)
+	ts, err := query.NewTableScan(tx, "MyTable", layout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}

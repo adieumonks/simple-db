@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/adieumonks/simple-db/metadata"
+	"github.com/adieumonks/simple-db/query"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/server"
 )
@@ -37,7 +38,7 @@ func TestIndexManager(t *testing.T) {
 		t.Fatalf("failed to get layout: %v", err)
 	}
 
-	ts, err := record.NewTableScan(tx, "MyTable", layout)
+	ts, err := query.NewTableScan(tx, "MyTable", layout)
 	if err != nil {
 		t.Fatalf("failed to create table scan: %v", err)
 	}

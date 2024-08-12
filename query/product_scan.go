@@ -1,9 +1,5 @@
 package query
 
-import (
-	"github.com/adieumonks/simple-db/record"
-)
-
 type ProductScan struct {
 	s1 Scan
 	s2 Scan
@@ -66,7 +62,7 @@ func (ps *ProductScan) GetString(fieldName string) (string, error) {
 	return ps.s2.GetString(fieldName)
 }
 
-func (ps *ProductScan) GetVal(fieldName string) (*record.Constant, error) {
+func (ps *ProductScan) GetVal(fieldName string) (*Constant, error) {
 	if ps.s1.HasField(fieldName) {
 		return ps.s1.GetVal(fieldName)
 	}

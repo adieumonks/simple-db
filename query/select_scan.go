@@ -48,7 +48,7 @@ func (ss *SelectScan) GetString(fieldName string) (string, error) {
 	return ss.scan.GetString(fieldName)
 }
 
-func (ss *SelectScan) GetVal(fieldName string) (*record.Constant, error) {
+func (ss *SelectScan) GetVal(fieldName string) (*Constant, error) {
 	return ss.scan.GetVal(fieldName)
 }
 
@@ -71,7 +71,7 @@ func (ss *SelectScan) SetString(fieldName string, val string) error {
 	return us.SetString(fieldName, val)
 }
 
-func (ss *SelectScan) SetVal(fieldName string, val *record.Constant) error {
+func (ss *SelectScan) SetVal(fieldName string, val *Constant) error {
 	us := ss.scan.(UpdateScan)
 	return us.SetVal(fieldName, val)
 }

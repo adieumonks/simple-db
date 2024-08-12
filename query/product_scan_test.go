@@ -21,13 +21,13 @@ func TestProductScan(t *testing.T) {
 	sch1.AddIntField("A")
 	sch1.AddStringField("B", 9)
 	layout1 := record.NewLayoutFromSchema(sch1)
-	ts1, _ := record.NewTableScan(tx, "T1", layout1)
+	ts1, _ := query.NewTableScan(tx, "T1", layout1)
 
 	sch2 := record.NewSchema()
 	sch2.AddIntField("C")
 	sch2.AddStringField("D", 9)
 	layout2 := record.NewLayoutFromSchema(sch2)
-	ts2, _ := record.NewTableScan(tx, "T2", layout2)
+	ts2, _ := query.NewTableScan(tx, "T2", layout2)
 
 	n := 200
 
@@ -65,8 +65,8 @@ func TestProductScan(t *testing.T) {
 	}
 	ts2.Close()
 
-	s1, _ := record.NewTableScan(tx, "T1", layout1)
-	s2, _ := record.NewTableScan(tx, "T2", layout2)
+	s1, _ := query.NewTableScan(tx, "T1", layout1)
+	s2, _ := query.NewTableScan(tx, "T2", layout2)
 	s3, _ := query.NewProductScan(s1, s2)
 
 	next, err := s3.Next()
