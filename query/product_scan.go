@@ -1,11 +1,14 @@
 package query
 
+var _ Scan = (*ProductScan)(nil)
+
 type ProductScan struct {
 	s1 Scan
 	s2 Scan
 }
 
 func NewProductScan(s1, s2 Scan) (*ProductScan, error) {
+
 	ps := &ProductScan{s1: s1, s2: s2}
 	if err := ps.BeforeFirst(); err != nil {
 		return nil, err

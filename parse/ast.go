@@ -9,19 +9,19 @@ import (
 )
 
 type QueryData struct {
-	Fields  []string
-	Talbles []string
-	Pred    *query.Predicate
+	Fields []string
+	Tables []string
+	Pred   *query.Predicate
 }
 
 func NewQueryData(fields, tables []string, pred *query.Predicate) *QueryData {
-	return &QueryData{Fields: fields, Talbles: tables, Pred: pred}
+	return &QueryData{Fields: fields, Tables: tables, Pred: pred}
 }
 
 func (q *QueryData) String() string {
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "select %s from %s", strings.Join(q.Fields, ", "), strings.Join(q.Talbles, ", "))
+	fmt.Fprintf(&sb, "select %s from %s", strings.Join(q.Fields, ", "), strings.Join(q.Tables, ", "))
 
 	if pred := q.Pred.String(); pred != "" {
 		fmt.Fprintf(&sb, " where %s", pred)
@@ -30,16 +30,51 @@ func (q *QueryData) String() string {
 	return sb.String()
 }
 
+type UpdateCommandType int
+
+const (
+	Insert UpdateCommandType = iota
+	Modify
+	Delete
+	CreateTable
+	CreateView
+	CreateIndex
+)
+
 type UpdateCommand interface {
 	updateCommand()
+	CommandType() UpdateCommandType
 }
 
-func (*InsertData) updateCommand()      {}
-func (*ModifyData) updateCommand()      {}
-func (*DeleteData) updateCommand()      {}
+func (*InsertData) updateCommand() {}
+func (*InsertData) CommandType() UpdateCommandType {
+	return Insert
+}
+
+func (*ModifyData) updateCommand() {}
+func (*ModifyData) CommandType() UpdateCommandType {
+	return Modify
+}
+
+func (*DeleteData) updateCommand() {}
+func (*DeleteData) CommandType() UpdateCommandType {
+	return Delete
+}
+
 func (*CreateTableData) updateCommand() {}
-func (*CreateViewData) updateCommand()  {}
+func (*CreateTableData) CommandType() UpdateCommandType {
+	return CreateTable
+}
+
+func (*CreateViewData) updateCommand() {}
+func (*CreateViewData) CommandType() UpdateCommandType {
+	return CreateView
+}
+
 func (*CreateIndexData) updateCommand() {}
+func (*CreateIndexData) CommandType() UpdateCommandType {
+	return CreateIndex
+}
 
 type InsertData struct {
 	TableName string

@@ -1,6 +1,11 @@
 package query
 
-import "github.com/adieumonks/simple-db/record"
+import (
+	"github.com/adieumonks/simple-db/record"
+)
+
+var _ Scan = (*SelectScan)(nil)
+var _ UpdateScan = (*SelectScan)(nil)
 
 type SelectScan struct {
 	scan Scan
@@ -91,7 +96,10 @@ func (ss *SelectScan) GetRID() *record.RID {
 	return us.GetRID()
 }
 
-func (ss *SelectScan) MoveToRID(rid *record.RID) {
-	us := ss.scan.(UpdateScan)
-	us.MoveToRID(rid)
+func (ss *SelectScan) MoveToRID(rid *record.RID) error {
+	us, ok := ss.scan.(UpdateScan)
+	if !ok {
+		return ErrNotUpdatable
+	}
+	return us.MoveToRID(rid)
 }
