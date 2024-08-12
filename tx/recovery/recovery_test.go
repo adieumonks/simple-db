@@ -33,6 +33,20 @@ func TestRecovery(t *testing.T) {
 }
 
 func initialize(t *testing.T) {
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	for i := 0; i < 2; i++ {
+		_, err = tx.Append("testfile")
+		if err != nil {
+			t.Fatalf("failed to append block: %v", err)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit transaction: %v", err)
+	}
+
 	tx1, err := db.NewTransaction()
 	if err != nil {
 		t.Fatalf("failed to create new transaction: %v", err)

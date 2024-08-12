@@ -15,6 +15,15 @@ func TestBufferManager(t *testing.T) {
 		t.Fatalf("failed to create new simple db: %v", err)
 	}
 
+	// init
+	fm := db.FileManager()
+	for i := 0; i < 4; i++ {
+		_, err := fm.Append("testfile")
+		if err != nil {
+			t.Fatalf("failed to append block: %v", err)
+		}
+	}
+
 	bm := db.BufferManager()
 
 	buff := make([]*buffer.Buffer, 6)

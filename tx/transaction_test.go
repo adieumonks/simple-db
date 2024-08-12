@@ -19,7 +19,11 @@ func TestTx(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create new transaction: %v", err)
 	}
-	block := file.NewBlockID("testfile", 1)
+	_, err = fm.Append("testfile")
+	if err != nil {
+		t.Fatalf("failed to append block: %v", err)
+	}
+	block := file.NewBlockID("testfile", 0)
 	if err := tx1.Pin(block); err != nil {
 		t.Fatalf("failed to pin block: %v", err)
 	}

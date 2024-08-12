@@ -26,6 +26,20 @@ func TestConcurrency(t *testing.T) {
 	lm = db.LogManager()
 	bm = db.BufferManager()
 
+	tx, err := db.NewTransaction()
+	if err != nil {
+		t.Fatalf("failed to create new transaction: %v", err)
+	}
+	for i := 0; i < 3; i++ {
+		_, err = tx.Append("testfile")
+		if err != nil {
+			t.Fatalf("failed to append block: %v", err)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("failed to commit transaction: %v", err)
+	}
+
 	wg = sync.WaitGroup{}
 	wg.Add(3)
 

@@ -23,8 +23,6 @@ func (q *QueryData) String() string {
 
 	fmt.Fprintf(&sb, "select %s from %s", strings.Join(q.Fields, ", "), strings.Join(q.Talbles, ", "))
 
-	fmt.Println(q.Pred)
-
 	if pred := q.Pred.String(); pred != "" {
 		fmt.Fprintf(&sb, " where %s", pred)
 	}
