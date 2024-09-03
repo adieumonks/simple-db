@@ -104,7 +104,9 @@ func (bl *BTreeLeaf) Insert(dataRID *record.RID) (*DirEntry, error) {
 		if err := bl.contents.SetFlag(-1); err != nil {
 			return nil, err
 		}
-		bl.contents.InsertLeaf(bl.currentSlot, bl.searchKey, dataRID)
+		if err := bl.contents.InsertLeaf(bl.currentSlot, bl.searchKey, dataRID); err != nil {
+			return nil, err
+		}
 		return NewDirEntry(firstKey, newBlock.Number()), nil
 	}
 

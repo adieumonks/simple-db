@@ -36,7 +36,9 @@ func NewBTreeIndex(tx *tx.Transaction, indexName string, leafLayout *record.Layo
 		if err != nil {
 			return nil, err
 		}
-		node.Format(&block, -1)
+		if err := node.Format(&block, -1); err != nil {
+			return nil, err
+		}
 	}
 
 	// deal with the directory
@@ -59,7 +61,9 @@ func NewBTreeIndex(tx *tx.Transaction, indexName string, leafLayout *record.Layo
 		if err != nil {
 			return nil, err
 		}
-		node.Format(&rootBlock, 0)
+		if err := node.Format(&rootBlock, 0); err != nil {
+			return nil, err
+		}
 
 		// insert initial directory entry
 		fieldType := dirSchema.Type("dataval")
