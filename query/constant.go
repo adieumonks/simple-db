@@ -31,6 +31,26 @@ func (c *Constant) Equals(other *Constant) bool {
 	}
 }
 
+func (c *Constant) CompareTo(other *Constant) int32 {
+	if c.ival != nil {
+		if *c.ival == *other.ival {
+			return 0
+		} else if *c.ival < *other.ival {
+			return -1
+		} else {
+			return 1
+		}
+	} else {
+		if *c.sval == *other.sval {
+			return 0
+		} else if *c.sval < *other.sval {
+			return -1
+		} else {
+			return 1
+		}
+	}
+}
+
 func (c *Constant) HashCode() int32 {
 	if c.ival != nil {
 		return *c.ival

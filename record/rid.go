@@ -19,6 +19,10 @@ func (rid *RID) Slot() int32 {
 	return rid.slot
 }
 
+func (rid *RID) Equals(other *RID) bool {
+	return rid.blockNum == other.blockNum && rid.slot == other.slot
+}
+
 func (rid *RID) String() string {
 	return fmt.Sprintf("[%d, %d]", rid.blockNum, rid.slot)
 }
