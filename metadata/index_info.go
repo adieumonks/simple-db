@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"github.com/adieumonks/simple-db/index"
-	"github.com/adieumonks/simple-db/index/hash"
 	"github.com/adieumonks/simple-db/record"
 	"github.com/adieumonks/simple-db/tx"
 )
@@ -29,13 +28,13 @@ func NewIndexInfo(indexName string, fieldName string, tableSchema *record.Schema
 }
 
 func (ii *IndexInfo) Open() index.Index {
-	return hash.NewHashIndex(ii.tx, ii.indexName, ii.indexLayout)
+	return index.NewHashIndex(ii.tx, ii.indexName, ii.indexLayout)
 }
 
 func (ii *IndexInfo) BlocksAccessed() int32 {
 	rpb := ii.tx.BlockSize() / ii.indexLayout.SlotSize()
 	numBlocks := ii.si.RecordsOutput() / rpb
-	return hash.NewHashIndex(ii.tx, ii.indexName, ii.indexLayout).SearchCost(numBlocks, rpb)
+	return index.NewHashIndex(ii.tx, ii.indexName, ii.indexLayout).SearchCost(numBlocks, rpb)
 }
 
 func (ii *IndexInfo) RecordsOutput() int32 {

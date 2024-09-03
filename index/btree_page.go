@@ -103,7 +103,9 @@ func (p *BTPage) AppendNew(flag int32) (*file.BlockID, error) {
 	if err := p.tx.Pin(block); err != nil {
 		return nil, err
 	}
-	p.Format(&block, flag)
+	if err := p.Format(&block, flag); err != nil {
+		return nil, err
+	}
 	return &block, nil
 }
 
