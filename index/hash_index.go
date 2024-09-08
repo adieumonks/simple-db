@@ -107,9 +107,10 @@ func (hi *HashIndex) Delete(dataVal *query.Constant, dataRID *record.RID) error 
 			if err := hi.ts.Delete(); err != nil {
 				return err
 			}
-			return nil
+			break
 		}
 	}
+	return nil
 }
 
 func (hi *HashIndex) Close() {
