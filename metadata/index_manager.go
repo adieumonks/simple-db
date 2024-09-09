@@ -94,7 +94,7 @@ func (im *IndexManager) GetIndexInfo(tableName string, tx *tx.Transaction) (map[
 				return nil, fmt.Errorf("failed to get stat info: %w", err)
 			}
 			ii := NewIndexInfo(indexName, fieldName, layout.Schema(), tx, si)
-			result[indexName] = ii
+			result[fieldName] = ii
 		}
 		next, err = ts.Next()
 		if err != nil {

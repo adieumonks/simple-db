@@ -102,7 +102,7 @@ func TestMetadataManager(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get index info: %v", err)
 	}
-	ii, ok := indexMap["indexA"]
+	ii, ok := indexMap["A"]
 	if !ok {
 		t.Fatalf("indexA not found")
 	}
@@ -111,7 +111,7 @@ func TestMetadataManager(t *testing.T) {
 	t.Logf("V(indexA, A) = %d", ii.DistinctValues("A"))
 	t.Logf("V(indexA, B) = %d", ii.DistinctValues("B"))
 
-	ii, ok = indexMap["indexB"]
+	ii, ok = indexMap["B"]
 	if !ok {
 		t.Fatalf("indexB not found")
 	}

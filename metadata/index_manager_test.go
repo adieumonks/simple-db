@@ -80,7 +80,7 @@ func TestIndexManager(t *testing.T) {
 		t.Fatalf("failed to get index info: %v", err)
 	}
 
-	ii, ok := indexMap["indexA"]
+	ii, ok := indexMap["A"]
 	if !ok {
 		t.Fatalf("index not found")
 	}
@@ -89,7 +89,7 @@ func TestIndexManager(t *testing.T) {
 	t.Logf("V(indexA,A) = %v", ii.DistinctValues("A"))
 	t.Logf("V(indexA,B) = %v", ii.DistinctValues("B"))
 
-	ii, ok = indexMap["indexB"]
+	ii, ok = indexMap["B"]
 	if !ok {
 		t.Fatalf("index not found")
 	}
