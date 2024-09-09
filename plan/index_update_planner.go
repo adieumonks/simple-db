@@ -42,7 +42,9 @@ func (up *IndexUpdatePlanner) ExecuteInsert(data *parse.InsertData, tx *tx.Trans
 	for i := 0; i < len(data.Fields); i++ {
 		fieldName := data.Fields[i]
 		val := data.Values[i]
-		us.SetVal(fieldName, val)
+		if err := us.SetVal(fieldName, val); err != nil {
+			return 0, err
+		}
 
 		ii, ok := indexes[fieldName]
 		if ok {
@@ -157,7 +159,9 @@ func (up *IndexUpdatePlanner) ExecuteModify(data *parse.ModifyData, tx *tx.Trans
 		if err != nil {
 			return 0, err
 		}
-		us.SetVal(fieldName, newVal)
+		if err := us.SetVal(fieldName, newVal); err != nil {
+			return 0, err
+		}
 
 		if idx != nil {
 			rid := us.GetRID()

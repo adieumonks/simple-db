@@ -46,7 +46,9 @@ func TestIndexRetrieval(t *testing.T) {
 	}
 
 	// query with index
-	idx.BeforeFirst(query.NewConstantWithInt(3))
+	if err := idx.BeforeFirst(query.NewConstantWithInt(3)); err != nil {
+		t.Fatalf("failed to move to first index: %v", err)
+	}
 	for {
 		next, err := idx.Next()
 		if err != nil {
@@ -168,7 +170,9 @@ func TestIndexDelete(t *testing.T) {
 	}
 
 	// confirm that the index has been updated
-	idx.BeforeFirst(query.NewConstantWithInt(3))
+	if err := idx.BeforeFirst(query.NewConstantWithInt(3)); err != nil {
+		t.Fatalf("failed to move to first index: %v", err)
+	}
 	next, err := idx.Next()
 	if err != nil {
 		t.Fatalf("failed to get next index: %v", err)
