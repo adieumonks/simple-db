@@ -30,7 +30,7 @@ func TestIndexRetrieval(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get index info: %v", err)
 	}
-	ii, ok := indexes["idxb"]
+	ii, ok := indexes["b"]
 	if !ok {
 		t.Fatalf("index idxb not found")
 	}
@@ -100,7 +100,7 @@ func TestIndexDelete(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get index info: %v", err)
 	}
-	ii, ok := indexes["idxb"]
+	ii, ok := indexes["b"]
 	if !ok {
 		t.Fatalf("index idxb not found")
 	}
@@ -208,7 +208,7 @@ func initialize(db *server.SimpleDB, tx *tx.Transaction, t *testing.T) {
 		t.Fatalf("failed to get index info: %v", err)
 	}
 
-	ii, ok := indexes["idxb"]
+	ii, ok := indexes["b"]
 	if !ok {
 		t.Fatalf("index idxa not found")
 	}

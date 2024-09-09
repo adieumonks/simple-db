@@ -32,7 +32,7 @@ func TestIndexJoin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get index info: %v", err)
 	}
-	ii, ok := indexes["idxa"]
+	ii, ok := indexes["a"]
 	if !ok {
 		t.Fatalf("index idxa not found")
 	}
@@ -137,7 +137,7 @@ func prepare_tables_for_index_join(db *server.SimpleDB, tx *tx.Transaction, t *t
 		t.Fatalf("failed to get index info: %v", err)
 	}
 
-	ii, ok := indexes["idxa"]
+	ii, ok := indexes["a"]
 	if !ok {
 		t.Fatalf("index idxa not found")
 	}

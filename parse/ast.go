@@ -124,6 +124,10 @@ func NewCreateViewData(viewName string, queryData *QueryData) *CreateViewData {
 	return &CreateViewData{ViewName: viewName, QueryData: queryData}
 }
 
+func (c *CreateViewData) ViewDef() string {
+	return c.QueryData.String()
+}
+
 type CreateIndexData struct {
 	IndexName string
 	TableName string
