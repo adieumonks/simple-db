@@ -71,7 +71,7 @@ func NewBTreeIndex(tx *tx.Transaction, indexName string, leafLayout *record.Layo
 		var minVal *query.Constant
 
 		if fieldType == record.INTEGER {
-			minVal = query.NewConstantWithInt(0)
+			minVal = query.NewConstantWithInt(math.MinInt32)
 		} else {
 			minVal = query.NewConstantWithString("")
 		}
