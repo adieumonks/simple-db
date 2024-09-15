@@ -72,6 +72,9 @@ func (s *ChunkScan) Next() (bool, error) {
 		}
 		s.moveToBlock(s.rp.Block().Number() + 1)
 		s.currentSlot, err = s.rp.NextAfter(s.currentSlot)
+		if err != nil {
+			return false, err
+		}
 	}
 	return true, nil
 }
