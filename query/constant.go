@@ -24,11 +24,13 @@ func (c *Constant) AsString() string {
 }
 
 func (c *Constant) Equals(other *Constant) bool {
-	if c.ival != nil {
+	if c.ival != nil && other.ival != nil {
 		return *c.ival == *other.ival
-	} else {
+	}
+	if c.sval != nil && other.sval != nil {
 		return *c.sval == *other.sval
 	}
+	return false
 }
 
 func (c *Constant) CompareTo(other *Constant) int32 {

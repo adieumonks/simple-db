@@ -1,7 +1,6 @@
 package plan_test
 
 import (
-	"fmt"
 	"math"
 	"math/rand/v2"
 	"path"
@@ -177,7 +176,6 @@ func TestIndexDelete(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get next index: %v", err)
 	}
-	fmt.Println(next)
 	if next {
 		t.Fatalf("record with b=3 not deleted from index")
 	}

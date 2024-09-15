@@ -43,7 +43,7 @@ func TestIndexQuery(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get index info: %v", err)
 	}
-	ii, ok := indexes["idxc"]
+	ii, ok := indexes["c"]
 	if !ok {
 		t.Fatalf("index idxc not found")
 	}
