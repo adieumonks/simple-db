@@ -37,7 +37,7 @@ func (tt *TempTable) TableName() string {
 	return tt.tableName
 }
 
-func (tt *TempTable) Layout() *record.Layout {
+func (tt *TempTable) GetLayout() *record.Layout {
 	return tt.layout
 }
 
