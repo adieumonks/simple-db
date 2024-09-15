@@ -83,7 +83,9 @@ func (mp *MultibufferProductPlan) copyRecordFrom(p plan.Plan) (*materialize.Temp
 		if !next {
 			break
 		}
-		dest.Insert()
+		if err := dest.Insert(); err != nil {
+			return nil, err
+		}
 		for _, fldName := range sch.Fields() {
 			val, err := src.GetVal(fldName)
 			if err != nil {
