@@ -151,3 +151,75 @@ func (rp *RecordPage) isValidSlot(slot int32) bool {
 func (rp *RecordPage) offset(slot int32) int32 {
 	return slot * rp.layout.SlotSize()
 }
+
+func (rp *RecordPage) Compare(slot1, slot2 int32, fields []string) (int, error) {
+	for _, fieldName := range fields {
+		if rp.layout.Schema().Type(fieldName) == INTEGER {
+			val1, err := rp.GetInt(slot1, fieldName)
+			if err != nil {
+				return 0, err
+			}
+			val2, err := rp.GetInt(slot2, fieldName)
+			if err != nil {
+				return 0, err
+			}
+			if val1 < val2 {
+				return -1, nil
+			} else if val1 > val2 {
+				return 1, nil
+			}
+		} else {
+			val1, err := rp.GetString(slot1, fieldName)
+			if err != nil {
+				return 0, err
+			}
+			val2, err := rp.GetString(slot2, fieldName)
+			if err != nil {
+				return 0, err
+			}
+			if val1 < val2 {
+				return -1, nil
+			} else if val1 > val2 {
+				return 1, nil
+			}
+		}
+	}
+	return 0, nil
+}
+
+func (rp *RecordPage) Swap(slot1, slot2 int32) error {
+	for _, fieldName := range rp.layout.Schema().Fields() {
+		if rp.layout.Schema().Type(fieldName) == INTEGER {
+			val1, err := rp.GetInt(slot1, fieldName)
+			if err != nil {
+				return err
+			}
+			val2, err := rp.GetInt(slot2, fieldName)
+			if err != nil {
+				return err
+			}
+			if err := rp.SetInt(slot1, fieldName, val2); err != nil {
+				return err
+			}
+			if err := rp.SetInt(slot2, fieldName, val1); err != nil {
+				return err
+			}
+		} else {
+			val1, err := rp.GetString(slot1, fieldName)
+			if err != nil {
+				return err
+			}
+			val2, err := rp.GetString(slot2, fieldName)
+			if err != nil {
+				return err
+			}
+			if err := rp.SetString(slot1, fieldName, val2); err != nil {
+				return err
+			}
+			if err := rp.SetString(slot2, fieldName, val1); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}

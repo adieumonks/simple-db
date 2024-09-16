@@ -27,3 +27,7 @@ func (rc *RecordComparator) Compare(s1 query.Scan, s2 query.Scan) (int32, error)
 	}
 	return 0, nil
 }
+
+func (rc *RecordComparator) Fields() []string {
+	return rc.fields
+}
